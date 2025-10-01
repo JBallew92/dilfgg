@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/dilfgg/static/css/main.8d5f6764.css",
+    "main.js": "/dilfgg/static/js/main.96ce0c83.js",
+    "static/js/453.8183a9d1.chunk.js": "/dilfgg/static/js/453.8183a9d1.chunk.js",
+    "index.html": "/dilfgg/index.html",
+    "main.8d5f6764.css.map": "/dilfgg/static/css/main.8d5f6764.css.map",
+    "main.96ce0c83.js.map": "/dilfgg/static/js/main.96ce0c83.js.map",
+    "453.8183a9d1.chunk.js.map": "/dilfgg/static/js/453.8183a9d1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8d5f6764.css",
+    "static/js/main.96ce0c83.js"
+  ]
+}
