@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/dilfgg/static/css/main.ddecb1e3.css",
-    "main.js": "/dilfgg/static/js/main.33c136bc.js",
-    "static/js/453.8183a9d1.chunk.js": "/dilfgg/static/js/453.8183a9d1.chunk.js",
-    "static/media/Race Sport.ttf": "/dilfgg/static/media/Race Sport.4d151853419b5a7771b3.ttf",
-    "index.html": "/dilfgg/index.html",
-    "main.ddecb1e3.css.map": "/dilfgg/static/css/main.ddecb1e3.css.map",
-    "main.33c136bc.js.map": "/dilfgg/static/js/main.33c136bc.js.map",
-    "453.8183a9d1.chunk.js.map": "/dilfgg/static/js/453.8183a9d1.chunk.js.map"
+    "main.css": "/static/css/main.b1fde06a.css",
+    "main.js": "/static/js/main.d1aa77d6.js",
+    "static/js/453.8183a9d1.chunk.js": "/static/js/453.8183a9d1.chunk.js",
+    "static/media/Race Sport.ttf": "/static/media/Race Sport.4d151853419b5a7771b3.ttf",
+    "index.html": "/index.html",
+    "main.b1fde06a.css.map": "/static/css/main.b1fde06a.css.map",
+    "main.d1aa77d6.js.map": "/static/js/main.d1aa77d6.js.map",
+    "453.8183a9d1.chunk.js.map": "/static/js/453.8183a9d1.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ddecb1e3.css",
-    "static/js/main.33c136bc.js"
+    "static/css/main.b1fde06a.css",
+    "static/js/main.d1aa77d6.js"
   ]
 }
