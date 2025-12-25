@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/static/css/main.1871c7b8.css",
-    "main.js": "/static/js/main.f9a3cac8.js",
+    "main.js": "/static/js/main.c4110e1e.js",
     "static/js/453.8183a9d1.chunk.js": "/static/js/453.8183a9d1.chunk.js",
     "static/media/Race Sport.ttf": "/static/media/Race Sport.4d151853419b5a7771b3.ttf",
     "index.html": "/index.html",
     "main.1871c7b8.css.map": "/static/css/main.1871c7b8.css.map",
-    "main.f9a3cac8.js.map": "/static/js/main.f9a3cac8.js.map",
+    "main.c4110e1e.js.map": "/static/js/main.c4110e1e.js.map",
     "453.8183a9d1.chunk.js.map": "/static/js/453.8183a9d1.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.1871c7b8.css",
-    "static/js/main.f9a3cac8.js"
+    "static/js/main.c4110e1e.js"
   ]
 }
