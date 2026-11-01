@@ -1,16 +1,24 @@
 import Container from 'react-bootstrap/Container';
-import styles from "./styles.css"
+import Button from 'react-bootstrap/Button';
+import { GAME_FORM_URL } from './NavBar';
 
-
-function FormSubmission({player}) {
+// The game form has a file upload, which Google doesn't allow in an
+// embedded form, so this page links out to it instead.
+function FormSubmission() {
 
     return (
-      <Container fluid className="w-100 vh-100 p-0">
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdFHzN0fT0ZuBfrrXY_h78xr5Y730bLTwm-WJKhR39RkIUbOg/viewform?embedded=true"
-         title="Submit a game"
-         className="w-100 h-100 border-0">
-        Loading…
-        </iframe>
+      <Container className="py-5 text-center">
+        <h1 className="mb-3">Submit a Game</h1>
+        <p className="mb-4">Played a game of Chickenfoot? Send in the results using the game form.</p>
+        <Button
+          variant="primary"
+          size="lg"
+          href={GAME_FORM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open the game form
+        </Button>
       </Container>
       
     );

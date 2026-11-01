@@ -3,14 +3,12 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { LinkContainer } from "react-router-bootstrap";
 
-
-    const openDILFPhotoForm = () => {
-    window.open(
-      "https://docs.google.com/forms/d/e/1FAIpQLSey8Qo12SB1c4ILGwX00c4K-q7OrzGuDVd65UbCSTO8-CwjqA/viewform", // replace with your Google Form link
-      "googleFormPopup",
-      "width=800,height=700,left=200,top=100"
-    );
-  };
+// Google Forms with file uploads don't work when embedded in the site,
+// so these open in a new tab (popup windows get blocked on phones).
+export const GAME_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSdFHzN0fT0ZuBfrrXY_h78xr5Y730bLTwm-WJKhR39RkIUbOg/viewform";
+const PHOTO_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSey8Qo12SB1c4ILGwX00c4K-q7OrzGuDVd65UbCSTO8-CwjqA/viewform";
 
 function DilfNavBar() {
   return (
@@ -26,13 +24,10 @@ function DilfNavBar() {
               <LinkContainer to="/Stats">
                 <Nav.Link>Meet Our Players</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/FormSubmission">
-                <Nav.Link>Submit a Game</Nav.Link>
-              </LinkContainer>
-              <Nav.Link
-                onClick={openDILFPhotoForm}
-                style={{ cursor: "pointer" }} // makes it behave like a clickable link
-              >
+              <Nav.Link href={GAME_FORM_URL} target="_blank" rel="noopener noreferrer">
+                Submit a Game
+              </Nav.Link>
+              <Nav.Link href={PHOTO_FORM_URL} target="_blank" rel="noopener noreferrer">
                 Submit a Photo
               </Nav.Link>
             </Nav>
