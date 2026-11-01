@@ -19,14 +19,14 @@
   },
   "scripts": {
     "photos": "node scripts/optimize-photos.js",
-    "prestart": "node scripts/build-photo-index.js",
+    "prestart": "node scripts/build-photo-index.js && node scripts/write-build-info.js",
     "start": "react-scripts start",
-    "prebuild": "node scripts/build-photo-index.js",
+    "prebuild": "node scripts/build-photo-index.js && node scripts/write-build-info.js",
     "build": "react-scripts build",
     "postbuild": "node -e \"require('fs').copyFileSync('build/index.html','build/404.html')\"",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "pretest": "node scripts/build-photo-index.js",
+    "pretest": "node scripts/build-photo-index.js && node scripts/write-build-info.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
