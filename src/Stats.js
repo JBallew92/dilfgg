@@ -3,25 +3,26 @@ import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import "./styles.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { list } from './playerStats.js';
+import { getPlayerPhoto, DEFAULT_PHOTO } from './photos.js';
 
+// Rounded once when the page loads, not on every render.
+const players = list.map(player => ({
+  ...player,
+  win_pct: Math.round(player.win_pct * 100),
+  avg_total_score: Math.round(player.avg_total_score)
+}));
 
-function getImage(player) {
-    return (
-      process.env.PUBLIC_URL +
-      '/images/profile_pics/' +
-      player.Player + 
-      ' ' + player['Fiscal Year'] +
-       '.png'
-    );
-  }
+const seasons = [...new Set(players.map(player => String(player['Fiscal Year'])))]
+  .sort()
+  .reverse();
 
 function getBackgroundImage(player) {
     return (
       process.env.PUBLIC_URL +
       '/images/assets/card_back_' + player['Fiscal Year'] +
-       '.png'
+       '.webp'
     );
   }
 
@@ -35,14 +36,14 @@ function getFlagImage(player) {
 }
 
 function PlayerCard({player}) {
-    const playerName = player["Player"];
-    const displayPlayerName = playerName.replace(/-/g, '&#8209;'); // Replace all standard hyphens with non-breaking ones
+    // Swap hyphens for non-breaking hyphens so names like Williams-Jones stay on one line
+    const displayPlayerName = player["Player"].replace(/-/g, '\u2011');
   return (
     <Container
     fluid
     className="card"
     style={{ backgroundImage: `url(${getBackgroundImage(player)}),
-      url(${process.env.PUBLIC_URL}/images/assets/default.png)` }}
+      url(${process.env.PUBLIC_URL}/images/assets/card_back_2023.webp)` }}
 >
   <div className="watermark">{player["watermark"]}</div>
       {/* Top Row: Player Name + Header */}
@@ -57,7 +58,7 @@ function PlayerCard({player}) {
         {/* We use Col-12 to ensure the name takes the full width */}
         <Col xs={12}> 
           {/* Note: Use your preferred font size solution here (clamp or static) */}
-          <div className="player-name" dangerouslySetInnerHTML={{ __html: displayPlayerName }}></div>
+          <div className="player-name">{displayPlayerName}</div>
         </Col>
       </Row>
 
@@ -92,15 +93,18 @@ function PlayerCard({player}) {
             className="flag"
             src={getFlagImage(player)}
             alt={player.nation}
+            loading="lazy"
             onError={(e) => { e.currentTarget.src = process.env.PUBLIC_URL + '/images/assets/unknown_flag.png';}}
             />
         </Col>
         <Col>
           <Image
             className="player-img"
-            src={getImage(player)}
+            src={getPlayerPhoto(player.Player, player['Fiscal Year'])}
             alt={player.Player}
-            onError={(e) => { e.currentTarget.src = process.env.PUBLIC_URL + '/images/profile_pics/default.png';}}
+            loading="lazy"
+            decoding="async"
+            onError={(e) => { e.currentTarget.src = DEFAULT_PHOTO;}}
             />
         </Col>
       </Row>
@@ -110,7 +114,7 @@ function PlayerCard({player}) {
         <Col className="podium-col d-flex justify-content-center align-items-center gap-2">
           <Image
             className="podium-flag"
-            src={process.env.PUBLIC_URL + '/images/assets/belt.png'}
+            src={process.env.PUBLIC_URL + '/images/assets/belt-icon.webp'}
             alt="First Place"
           />
           <span className="podium-value">{player["first"]}</span>
@@ -132,52 +136,28 @@ function PlayerCard({player}) {
 
 
   function CardLayout() {
-    const playerListUpdated = list.map(player => ({
-      ...player,
-      win_pct: Math.round(player.win_pct * 100),
-      avg_total_score: Math.round(player.avg_total_score)
-  }));
-    const [selectedYear, setSelectedYear] = useState("2026"); // State for filtering
-    const [filteredPlayers, setFilteredPlayers] = useState(playerListUpdated); // Store filtered results
+    // Default to the newest season in the data.
+    const [selectedYear, setSelectedYear] = useState(seasons[0] || "");
 
-    useEffect(() => {
-    if (!playerListUpdated?.length) return;
-
-    if (selectedYear === "") {
-      setFilteredPlayers(playerListUpdated);
-    } else {
-      setFilteredPlayers(
-        playerListUpdated.filter(
-          (player) => String(player["Fiscal Year"]) === selectedYear
-        )
-      );
-    }
-  }, [playerListUpdated, selectedYear]);
-
-    // Handle filter change
-    const handleFilterChange = (event) => {
-      const year = event.target.value;
-      setSelectedYear(year);
-
-      if (year === "") {
-        setFilteredPlayers(playerListUpdated); // Show all if no filter is selected
-      } else {
-        setFilteredPlayers(playerListUpdated.filter(player => String(player['Fiscal Year']) === year));
-      }
-    };
+    const filteredPlayers = useMemo(
+      () => selectedYear === ""
+        ? players
+        : players.filter(player => String(player['Fiscal Year']) === selectedYear),
+      [selectedYear]
+    );
 
      return (
       <Container>
         {/* Filter Dropdown */}
-        <select className="form-select mb-3" value={selectedYear} onChange={handleFilterChange}>
+        <select className="form-select mb-3" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
           <option value="">All Seasons</option>
-          {[...new Set(playerListUpdated.map(player => player['Fiscal Year']))].map(year => (
+          {seasons.map(year => (
             <option key={year} value={year}>{year}</option>
           ))}
         </select>
         <Row className="player-grid">
           {filteredPlayers.map((player, index) => (
-            <Col xs="auto" sm="auto" md="auto" key={index} className="player-card-wrapper">
+            <Col xs="auto" sm="auto" md="auto" key={player.Player + ' ' + player['Fiscal Year'] + ' ' + index} className="player-card-wrapper">
               <PlayerCard 
               player={player}
               />

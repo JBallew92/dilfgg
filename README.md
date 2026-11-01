@@ -1,3 +1,15 @@
+# dilf.gg
+
+Website for the Dominoes International League Federation.
+
+## Adding player photos
+
+1. Save the photo in `public/images/profile_pics` named `First Last YEAR.png` (`.jpg` works too), e.g. `James Ballew 2026.png`.
+2. Run `npm run photos`. It shrinks the photo to a small `.webp` and removes the full-size original.
+3. Commit the new `.webp` file.
+
+A player with no photo for a season shows their most recent earlier photo, and the default silhouette if they have none.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
