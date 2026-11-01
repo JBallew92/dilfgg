@@ -3,15 +3,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import { list } from './orgStats.js';
-
-function getImage(name, year) {
-    return (
-      process.env.PUBLIC_URL +
-      '/images/profile_pics/' +
-      name + ' ' + year +
-      '.png'
-    );
-}
+import { getPlayerPhoto } from './photos.js';
 
 function AboutUs() {
     return( 
@@ -37,7 +29,7 @@ function AboutUs() {
             <Col xs={12} sm={12} md={6} lg={6} xl={6} order={{ xs: 2, sm: 2, md: 1, lg: 1, xl: 1}} className="org-stats-picture p-0 order-sm-2 order-md-1">
                 <Image
                     className="map"
-                    src={process.env.PUBLIC_URL + '/images/assets/Map-reduced.png'}
+                    src={process.env.PUBLIC_URL + '/images/assets/map.webp'}
                     alt="Two Nations"
                     fluid
                     style={{ maxWidth: '100%', height: '100%' }}
@@ -51,7 +43,7 @@ function AboutUs() {
             <Col xs={12} sm={12} md={6} lg={6} xl={6} order={{ xs: 2, sm: 2, md: 2, lg: 2, xl: 2}} className="org-stats-picture p-0">
                 <Image
                     className="map"
-                    src={process.env.PUBLIC_URL + '/images/assets/belt.png'}
+                    src={process.env.PUBLIC_URL + '/images/assets/belt.webp'}
                     alt="Belt"
                     fluid
                     style={{ maxWidth: '100%', height: '100%' }}
@@ -60,12 +52,12 @@ function AboutUs() {
         </Row>
         <Row className="org-stats"> 
             <Col xs={12} sm={12} md={6} lg={6} xl={6} order={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2}} className="org-stats-text d-flex align-items-center justify-content-center text-center order-sm-1 order-md-2">
-                And while we're all still striving for that perfect game, everyone is contributing to the communities all time score!
+                And while we're all still striving for that perfect game, everyone is contributing to the community's all-time score!
             </Col>
             <Col xs={12} sm={12} md={6} lg={6} xl={6} order={{ xs: 2, sm: 2, md: 1, lg: 1, xl: 1}} className="org-stats-picture p-0 order-sm-2 order-md-1">
-                <div class="high-score-container">
-                    <span class="label">HIGH SCORE</span>
-                    <span class="score">{list[0]["Total Score"].toLocaleString()}</span>
+                <div className="high-score-container">
+                    <span className="label">HIGH SCORE</span>
+                    <span className="score">{list[0]["Total Score"].toLocaleString()}</span>
                 </div>
             </Col>
         </Row>
@@ -80,8 +72,10 @@ function AboutUs() {
             ].map(([name, year, title], idx) => (
                 <Col key={idx} xs={6} md={4} className="text-center mb-4">
                 <Image
-                    src={getImage(name, year)}
+                    src={getPlayerPhoto(name, year)}
                     alt={name}
+                    loading="lazy"
+                    decoding="async"
                     roundedCircle
                     fluid
                 />

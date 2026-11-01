@@ -18,10 +18,15 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "photos": "node scripts/optimize-photos.js",
+    "prestart": "node scripts/build-photo-index.js",
+    "start": "react-scripts start",
+    "prebuild": "node scripts/build-photo-index.js",
+    "build": "react-scripts build",
+    "postbuild": "node -e \"require('fs').copyFileSync('build/index.html','build/404.html')\"",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "pretest": "node scripts/build-photo-index.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -44,6 +49,7 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0"
+    "gh-pages": "^6.3.0",
+    "sharp": "^0.34.5"
   }
 }
