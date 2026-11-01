@@ -1,7 +1,8 @@
 // Shrinks player photos for the web.
 //
 // Drop a full-size photo into public/images/profile_pics named
-// "First Last YEAR.png" (or .jpg/.jpeg/.heic), then run `npm run photos`.
+// "First Last YEAR.png", then run `npm run photos`. Only .png files are used;
+// other formats (like .jpg) are skipped.
 // Each photo is resized to at most 800px tall, saved as .webp (transparency
 // is kept), and the original is removed from the folder.
 const fs = require('fs');
@@ -14,7 +15,14 @@ const MAX_HEIGHT = 800;
 async function main() {
   const files = fs
     .readdirSync(dir)
-    .filter((f) => /\.(png|jpe?g|heic)$/i.test(f));
+    .filter((f) => /\.png$/i.test(f));
+
+  const skipped = fs
+    .readdirSync(dir)
+    .filter((f) => /\.(jpe?g|heic|gif|bmp|tiff?)$/i.test(f));
+  for (const file of skipped) {
+    console.warn(`Skipped ${file}: player photos must be .png`);
+  }
 
   if (files.length === 0) {
     console.log('No new photos to optimize.');

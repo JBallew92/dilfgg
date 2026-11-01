@@ -4,7 +4,9 @@ Website for the Dominoes International League Federation.
 
 ## Adding player photos
 
-1. Save the photo in `public/images/profile_pics` named `First Last YEAR.png` (`.jpg` works too), e.g. `James Ballew 2026.png`.
+Player photos must be `.png` files. Other formats (like `.jpg`) are skipped.
+
+1. Save the photo in `public/images/profile_pics` named `First Last YEAR.png`, e.g. `James Ballew 2026.png`.
 2. Run `npm run photos`. It shrinks the photo to a small `.webp` and removes the full-size original.
 3. Commit the new `.webp` file.
 
