@@ -1,0 +1,25 @@
+name: Build check
+
+# Builds the site on every push and pull request so broken changes are caught
+# before they are deployed. This does not deploy anything; the live site on
+# the gh-pages branch is still published by `npm run deploy`.
+
+on:
+  push:
+    branches-ignore: [gh-pages]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # CI=false keeps lint warnings as warnings, matching local builds.
+      - run: npm run build
+        env:
+          CI: false
