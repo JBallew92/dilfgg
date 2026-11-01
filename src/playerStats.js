@@ -812,12 +812,12 @@ export const list = [
     {
         "Fiscal Year": 2026,
         "Player": "Aven-itza De Primavera",
-        "win_pct": 0.0625,
+        "win_pct": 0.058823529411764705,
         "min_half_time_score": 59,
         "min_2nd_half_score": 99,
         "min_total_score": 218,
-        "avg_total_score": 335,
-        "games_played": 16,
+        "avg_total_score": 336,
+        "games_played": 17,
         "nation": "United States",
         "watermark": "USA",
         "first": 1,
@@ -1153,20 +1153,5 @@ export const list = [
         "first": 0,
         "second": 1,
         "third": 1
-    },
-    {
-        "Fiscal Year": 2026,
-        "Player": "Aven-itza de primavera",
-        "win_pct": 0.0,
-        "min_half_time_score": 155,
-        "min_2nd_half_score": 201,
-        "min_total_score": 356,
-        "avg_total_score": 356,
-        "games_played": 1,
-        "nation": null,
-        "watermark": null,
-        "first": 0,
-        "second": 0,
-        "third": 0
     }
 ];
