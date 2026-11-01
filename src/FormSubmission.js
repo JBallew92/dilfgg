@@ -6,8 +6,8 @@ function FormSubmission({player}) {
 
     return (
       <Container fluid className="w-100 vh-100 p-0">
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSd-DcCCT9f01Y4bK_UzenM_l8MC8yfergtefFU4RpJzDVC4vg/viewform?embedded=true"
-         title="form"
+        <iframe src="https://docs.google.com/forms/d/14A70uEHr0OEK_oDunD_ZRopLIrT7i3CNCjJjnNKlvNQ/viewform?embedded=true"
+         title="Submit a game"
          className="w-100 h-100 border-0">
         Loading…
         </iframe>
