@@ -3,23 +3,28 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 
-
-import Stats from './Stats';
+import Home from './pages/Home';
+import Standings from './pages/Standings';
+import History from './pages/History';
 import FormSubmission from './FormSubmission';
-import AboutUs from './AboutUs';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <Router>
-      <App />
       <Routes>
-          <Route path="/" element={<AboutUs />} />
-          <Route path="/Stats" element={<Stats />} />
+        <Route element={<App />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/Standings" element={<Standings />} />
+          <Route path="/History" element={<History />} />
           <Route path="/FormSubmission" element={<FormSubmission />} />
-    </Routes>
+          {/* Old links to the player cards page */}
+          <Route path="/Stats" element={<Navigate to="/Standings" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
     </Router>
   </React.StrictMode>
 );
