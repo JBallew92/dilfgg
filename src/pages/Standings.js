@@ -1,9 +1,36 @@
-import { useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import CardCarousel from '../components/CardCarousel';
 import { DEFAULT_PHOTO } from '../photos';
-import { byBelts, seasons, standingsFor, lastUpdated } from '../league';
+import { byBelts, playerSeasons, seasons, standingsFor, lastUpdated } from '../league';
 
 // Short codes for players from outside the US.
 const NATION_CODES = { Austria: 'AUT' };
+
+// A player's cards, newest season first.
+function cardsFor(name) {
+  return playerSeasons.filter((p) => p.name === name).sort((a, b) => b.year - a.year);
+}
+
+// Width of an element, kept up to date as the window resizes.
+function useWidth(ref) {
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const measure = () => setWidth(el.clientWidth);
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [ref]);
+  return width;
+}
+
+// Opens on the season being viewed (or the newest, for All time).
+function SeasonCards({ name, season }) {
+  const cards = cardsFor(name);
+  const at = Math.max(0, cards.findIndex((c) => c.year === season));
+  return <CardCarousel cards={cards} label={(c) => c.year} itemName="seasons" startAt={at} />;
+}
 
 const SORTS = {
   belts: byBelts,
@@ -27,6 +54,11 @@ function SortHeader({ id, sort, setSort, children }) {
 export default function Standings() {
   const [season, setSeason] = useState(seasons[0]);
   const [sort, setSort] = useState('belts');
+  const [open, setOpen] = useState(null);
+  const toggle = (name) => setOpen(open === name ? null : name);
+  const shellRef = useRef(null);
+  // The cards are sized to the visible table area, not the (wider, scrolling) table.
+  const shellWidth = useWidth(shellRef);
 
   const rows = useMemo(() => standingsFor(season).sort(SORTS[sort]), [season, sort]);
   const header = { sort, setSort };
@@ -49,7 +81,7 @@ export default function Standings() {
         </div>
       </div>
 
-      <div className="table-shell">
+      <div className="table-shell" ref={shellRef}>
         <table className="standings">
           <thead>
             <tr>
@@ -67,27 +99,41 @@ export default function Standings() {
           </thead>
           <tbody>
             {rows.map((r, i) => (
-              <tr key={r.name}>
-                <td className={'left rank-cell' + (i < 3 ? ' podium' : '')}>{i + 1}</td>
-                <td className="left">
-                  <div className="player-cell">
-                    <img src={r.photo} alt="" loading="lazy"
-                      onError={(e) => { e.currentTarget.src = DEFAULT_PHOTO; }} />
-                    <span className="name">{r.name}</span>
-                    {r.nation !== 'United States' && (
-                      <span className="nation-tag" title={r.nation}>{NATION_CODES[r.nation] || r.nation.slice(0, 3).toUpperCase()}</span>
-                    )}
-                  </div>
-                </td>
-                <td>{r.games_played}</td>
-                <td className="belts">{r.first}</td>
-                <td>{r.second}</td>
-                <td>{r.third}</td>
-                <td className="strong">{r.win_pct}%</td>
-                <td className="strong">{r.avg_total_score}</td>
-                <td>{r.min_total_score}</td>
-                <td>{r.min_half_time_score}</td>
-              </tr>
+              <Fragment key={r.name}>
+                <tr className={'player-row' + (open === r.name ? ' open' : '')} onClick={() => toggle(r.name)}>
+                  <td className={'left rank-cell' + (i < 3 ? ' podium' : '')}>{i + 1}</td>
+                  <td className="left">
+                    <div className="player-cell">
+                      <img src={r.photo} alt="" loading="lazy"
+                        onError={(e) => { e.currentTarget.src = DEFAULT_PHOTO; }} />
+                      <button type="button" className="name name-btn" aria-expanded={open === r.name}
+                        onClick={(e) => { e.stopPropagation(); toggle(r.name); }}>
+                        {r.name} <span className="chevron" aria-hidden="true">{open === r.name ? '▴' : '▾'}</span>
+                      </button>
+                      {r.nation !== 'United States' && (
+                        <span className="nation-tag" title={r.nation}>{NATION_CODES[r.nation] || r.nation.slice(0, 3).toUpperCase()}</span>
+                      )}
+                    </div>
+                  </td>
+                  <td>{r.games_played}</td>
+                  <td className="belts">{r.first}</td>
+                  <td>{r.second}</td>
+                  <td>{r.third}</td>
+                  <td className="strong">{r.win_pct}%</td>
+                  <td className="strong">{r.avg_total_score}</td>
+                  <td>{r.min_total_score}</td>
+                  <td>{r.min_half_time_score}</td>
+                </tr>
+                {open === r.name && (
+                  <tr className="player-expand">
+                    <td colSpan={10}>
+                      <div className="expand-inner" style={shellWidth ? { width: shellWidth - 2 } : undefined}>
+                        <SeasonCards name={r.name} season={season} />
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>
