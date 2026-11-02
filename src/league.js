@@ -77,6 +77,12 @@ export function standingsFor(season) {
   return rows.map((p) => ({ ...p, photo: getPlayerPhoto(p.name, p.year) }));
 }
 
+// A DILF season runs December through November and is named for the year it
+// ends in, so December 2026 is already part of the 2027 season.
+export function seasonOf(date) {
+  return date.getMonth() === 11 ? date.getFullYear() + 1 : date.getFullYear();
+}
+
 // Places each player moved since the season before, ranked by belts.
 // A number (positive = up), 'new' for a first season, or 'back' for a player
 // returning after time off. All time has no previous season, so it returns {}.
@@ -115,7 +121,7 @@ export const seasonSummaries = (() => {
     const newNation = i > 0 && [...nations].some((n) => !seen.has(n));
     nations.forEach((n) => seen.add(n));
     let milestone = '';
-    const inProgress = year === currentSeason && year === new Date().getFullYear();
+    const inProgress = year === currentSeason && year === seasonOf(new Date());
     if (i === 0) milestone = 'League founded';
     else if (inProgress) milestone = 'In progress';
     else if (newNation) milestone = 'Goes international';
