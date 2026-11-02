@@ -48,7 +48,7 @@ export default function History() {
               </div>
               <div className="season-body">
                 <div className="season-champ">
-                  <div className="gold-label">DILF Champion</div>
+                  <div className="gold-label">{s.inProgress ? 'Provisional Champion' : 'DILF Champion'}</div>
                   <div className="card-scale"><PlayerCard player={s.card} /></div>
                 </div>
                 <div className="season-recap">
