@@ -19,6 +19,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - run: npm test
       # CI=false keeps lint warnings as warnings, matching local builds.
       - run: npm run build
         env:
