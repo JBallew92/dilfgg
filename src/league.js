@@ -93,8 +93,8 @@ export function movesFor(season) {
   return moves;
 }
 
-// The current season's top 10, for the home page cards.
-export const topOfTable = standingsFor(currentSeason).sort(byBelts).slice(0, 10);
+// Every player in the current season, ranked, for the home page cards.
+export const topOfTable = standingsFor(currentSeason).sort(byBelts);
 
 // Fewest games a player needs in a season to count for Best win %.
 const MIN_GAMES_FOR_WIN_PCT = 3;
