@@ -293,6 +293,7 @@ body {
 
 /* Home: league totals */
 .totals {
+  text-align: center;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 32px;
@@ -361,12 +362,9 @@ body {
   display: none;
 }
 @media (max-width: 600px) {
-  /* Phones: no belt leader card, centred totals, Full standings under the card */
+  /* Phones: no belt leader card, Full standings under the card */
   .hero-card {
     display: none;
-  }
-  .totals {
-    text-align: center;
   }
   .section-head a {
     display: none;
