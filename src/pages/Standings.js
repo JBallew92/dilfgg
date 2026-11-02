@@ -32,13 +32,13 @@ function Move({ move }) {
   if (move === 'new') return <span className="move" title="First season">New</span>;
   if (move === 'back' || move === 0) {
     const title = move === 0 ? 'No change from last season' : 'Did not play last season';
-    return <span className="move" title={title} aria-label={title}>–</span>;
+    return <span className="move" role="img" title={title} aria-label={title}>–</span>;
   }
   const up = move > 0;
   const n = Math.abs(move);
   const title = `${up ? 'Up' : 'Down'} ${n} from last season`;
   return (
-    <span className={'move ' + (up ? 'up' : 'down')} title={title} aria-label={title}>
+    <span className={'move ' + (up ? 'up' : 'down')} role="img" title={title} aria-label={title}>
       {up ? '▲' : '▼'} {n}
     </span>
   );
