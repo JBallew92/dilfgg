@@ -699,6 +699,25 @@ body {
   color: #f87171;
 }
 
+/* Inline bits (line breaks, words) shown on one layout only */
+.on-phone {
+  display: none;
+}
+@media (max-width: 600px) {
+  .on-desktop {
+    display: none;
+  }
+  .on-phone {
+    display: inline;
+  }
+}
+/* Keep the app heading on one line on wide screens */
+@media (min-width: 1100px) {
+  .app-title {
+    white-space: nowrap;
+  }
+}
+
 /* The table on desktop, a tap-to-open list on phones */
 .only-phone {
   display: none;

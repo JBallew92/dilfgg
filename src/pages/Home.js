@@ -102,7 +102,7 @@ export default function Home() {
         <div className="wrap section split">
           <div className="copy">
             <p className="eyebrow">Our story</p>
-            <h2 className="section-title">Founded at the Kitchen Table</h2>
+            <h2 className="section-title">Founded at the<br className="on-phone" /> Kitchen Table</h2>
             <p className="lead">
               DILF was founded in 2022 outside of Portland, Oregon. Our highly competitive family
               decided playing dominoes simply wasn't enough, so we started tracking the stats.
@@ -121,7 +121,9 @@ export default function Home() {
         <AppShots />
         <div className="copy">
           <p className="eyebrow">New</p>
-          <h2 className="section-title">Chickenfoot, in your Pocket</h2>
+          <h2 className="section-title app-title">
+            Chickenfoot<span className="on-desktop">,</span><span className="on-phone">: Dominoes,</span> in your Pocket
+          </h2>
           <p className="lead" style={{ marginBottom: 24 }}>
             Play online with your friends or practice with some friendly farm pals. Pick your own
             farm persona and track your stats from each complete game.
