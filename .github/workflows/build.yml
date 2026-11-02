@@ -1,12 +1,11 @@
 name: Build check
 
-# Builds the site on every push and pull request so broken changes are caught
-# before they are deployed. This does not deploy anything; the live site on
-# the gh-pages branch is still published by `npm run deploy`.
+# Tests and builds every pull request and branch push so broken changes are
+# caught before they reach main. Deploying is done by deploy.yml.
 
 on:
   push:
-    branches-ignore: [gh-pages]
+    branches-ignore: [gh-pages, main]
   pull_request:
 
 jobs:
