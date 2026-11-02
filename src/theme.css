@@ -351,10 +351,31 @@ body {
 .section-head .section-title {
   margin: 0;
 }
-.section-head a {
+.section-head a,
+.full-link-below a {
   font-weight: 600;
   text-decoration: none;
   padding: 10px 0;
+}
+.full-link-below {
+  display: none;
+}
+@media (max-width: 600px) {
+  /* Phones: no belt leader card, centred totals, Full standings under the card */
+  .hero-card {
+    display: none;
+  }
+  .totals {
+    text-align: center;
+  }
+  .section-head a {
+    display: none;
+  }
+  .full-link-below {
+    display: block;
+    margin: 20px 0 0;
+    text-align: center;
+  }
 }
 .carousel-row {
   display: flex;
@@ -665,47 +686,139 @@ body {
   border-radius: 4px;
   padding: 1px 6px;
 }
-/* Click a player to see their cards */
-.player-row {
-  cursor: pointer;
+/* Places moved since last season, beside a player's name */
+.move {
+  margin-left: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--text-muted);
 }
-.player-row:hover td,
-.player-row.open td {
-  background: rgba(45, 60, 137, 0.35);
+.move.up {
+  color: #4ade80;
 }
-.name-btn {
+.move.down {
+  color: #f87171;
+}
+
+/* The table on desktop, a tap-to-open list on phones */
+.only-phone {
+  display: none;
+}
+@media (max-width: 600px) {
+  .only-desktop {
+    display: none;
+  }
+  .only-phone {
+    display: block;
+  }
+}
+.sort-pick {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.sort-pick select {
   font: inherit;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-height: 40px;
+}
+.standings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-top: 0;
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.standings-list li {
+  border-top: 1px solid var(--line-strong);
+}
+.standings-list li.open {
+  background: rgba(45, 60, 137, 0.35);
+}
+.pl-head {
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  width: 100%;
   background: none;
   border: 0;
-  padding: 0;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
 }
-.name-btn:hover {
+.pl-head img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+  background: var(--navy);
+}
+.pl-rank {
+  flex: 0 0 26px;
+  font-family: var(--display);
+  font-size: 18px;
+  color: var(--text-muted);
+}
+.pl-rank.podium {
   color: var(--gold);
 }
-.name-btn .chevron {
-  color: var(--text-muted);
+.pl-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+}
+.standings-list li.open .pl-name {
+  color: var(--gold);
+}
+.pl-sort {
+  font-weight: 700;
+  color: var(--gold);
+  white-space: nowrap;
+}
+.pl-head .chevron {
   font-size: 12px;
-  margin-left: 4px;
+  color: var(--text-muted);
 }
-.standings .player-expand td {
-  text-align: left;
-  border-top: 0;
-  padding: 8px 0 28px;
-  background: rgba(45, 60, 137, 0.2);
+.pl-stats {
+  margin: 0;
+  padding: 4px 14px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 0;
+  text-align: center;
 }
-.player-expand .ranked-card .rank {
+.pl-stats > div {
+  flex: 0 0 25%;
+}
+.pl-stats dt {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.pl-stats dd {
+  margin: 0;
   font-size: 18px;
+  font-weight: 700;
 }
-.expand-inner {
-  /* Stays in view while the table scrolls sideways on small screens. */
-  position: sticky;
-  left: 0;
-  text-align: left;
+.pl-stats dd.gold {
+  color: var(--gold);
 }
 
 .updated-note {
@@ -762,14 +875,8 @@ body {
   padding: 0;
 }
 .season {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
   padding: 28px 0;
   border-top: 1px solid var(--line-strong);
-}
-.season-year {
-  flex: 0 0 140px;
 }
 .season-year .year {
   font-family: var(--display);
@@ -787,67 +894,49 @@ body {
   border-radius: 4px;
   padding: 3px 8px;
 }
+/* Champion card and recap, spread evenly across the row */
 .season-body {
-  flex: 1 1 520px;
-  min-width: 0;
+  margin-top: 24px;
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  justify-content: space-evenly;
   align-items: center;
+  gap: 48px;
 }
-.season-photo {
-  flex: 0 0 120px;
-  height: 150px;
-  border-radius: 10px;
-  position: relative;
-  overflow: hidden;
-}
-.season-photo img {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 0;
-  height: 140px;
-  width: auto;
-}
-.season-leader {
-  flex: 1 1 180px;
-  min-width: 0;
-}
-.season-leader .label {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.season-leader .who {
-  font-size: 24px;
-  font-weight: 700;
-}
-.season-leader .belts {
+.season-champ {
+  flex: 0 0 340px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 4px;
-  color: var(--gold);
-  font-weight: 600;
+  gap: 10px;
 }
-.season-leader .belts img {
-  height: 22px;
-  width: auto;
-}
-.season-stats {
-  flex: 1 1 500px;
+.gold-label {
   margin: 0;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 16px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: var(--gold);
+  text-align: center;
 }
-@media (max-width: 700px) {
-  .season-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.season-recap {
+  flex: 0 1 480px;
+  min-width: 0;
+  text-align: center;
+}
+.season-recap .gold-label {
+  margin-bottom: 20px;
+}
+/* 2 stats per row; the odd one out sits centred on its own row */
+.season-stats {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px 0;
+}
+.season-stats > div {
+  flex: 0 0 50%;
 }
 .season-stats dt {
   font-size: 13px;
@@ -863,6 +952,37 @@ body {
   font-size: 13px;
   font-weight: 400;
   color: var(--text-soft);
+}
+@media (max-width: 600px) {
+  .history-intro img {
+    display: none;
+  }
+  .season-body {
+    gap: 24px;
+  }
+  .season-champ {
+    flex-basis: 100%;
+  }
+  .season-champ .card-scale {
+    width: 238px;
+    height: 336px;
+  }
+  .season-champ .card-scale > * {
+    transform: scale(0.7);
+    transform-origin: top left;
+  }
+  .season-recap {
+    flex-basis: 100%;
+  }
+  .season-recap .gold-label {
+    margin-bottom: 12px;
+  }
+  .season-stats {
+    gap: 16px 0;
+  }
+  .season-stats > div {
+    flex-basis: 33.333%;
+  }
 }
 .leaders {
   display: grid;

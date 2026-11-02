@@ -77,6 +77,22 @@ export function standingsFor(season) {
   return rows.map((p) => ({ ...p, photo: getPlayerPhoto(p.name, p.year) }));
 }
 
+// Places each player moved since the season before, ranked by belts.
+// A number (positive = up), 'new' for a first season, or 'back' for a player
+// returning after time off. All time has no previous season, so it returns {}.
+export function movesFor(season) {
+  if (season === 'all') return {};
+  const ranked = (y) => standingsFor(y).sort(byBelts).map((r) => r.name);
+  const prev = ranked(season - 1);
+  const earlier = new Set(playerSeasons.filter((p) => p.year < season).map((p) => p.name));
+  const moves = {};
+  ranked(season).forEach((name, i) => {
+    const was = prev.indexOf(name);
+    moves[name] = was >= 0 ? was - i : earlier.has(name) ? 'back' : 'new';
+  });
+  return moves;
+}
+
 // The current season's top 10, for the home page cards.
 export const topOfTable = standingsFor(currentSeason).sort(byBelts).slice(0, 10);
 
@@ -106,6 +122,7 @@ export const seasonSummaries = (() => {
       year,
       leader: leader.name,
       leaderBelts: leader.first,
+      card: leader,
       photo: getPlayerPhoto(leader.name, year),
       games: rows.reduce((sum, p) => sum + p.first, 0),
       players: rows.length,

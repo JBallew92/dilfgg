@@ -41,10 +41,22 @@ test('history page shows every season', () => {
   expect(screen.getAllByText('Best win %').length).toBeGreaterThan(0);
 });
 
-test('clicking a player on the standings shows their cards', () => {
+test('tapping a player in the phone list shows their stats', () => {
   renderAt('/Standings', <Standings />);
+  expect(document.querySelector('.pl-stats')).toBeNull();
   const first = screen.getAllByRole('button', { expanded: false })[0];
   fireEvent.click(first);
   expect(screen.getAllByRole('button', { expanded: true }).length).toBe(1);
-  expect(document.querySelector('.player-expand .card')).not.toBeNull();
+  expect(document.querySelector('.pl-stats')).not.toBeNull();
+});
+
+test('history shows the champion card for each season', () => {
+  renderAt('/History', <History />);
+  expect(screen.getAllByText('DILF Champion').length).toBe(5);
+  expect(document.querySelectorAll('.season-champ .card').length).toBe(5);
+});
+
+test('standings show places moved since last season', () => {
+  renderAt('/Standings', <Standings />);
+  expect(document.querySelectorAll('.move.up').length).toBeGreaterThan(0);
 });

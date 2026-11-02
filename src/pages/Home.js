@@ -27,6 +27,8 @@ function CurrentStandings() {
         <Link to="/Standings">Full standings →</Link>
       </div>
       <CardCarousel cards={topOfTable} label={(p, i) => `#${i + 1}`} itemName="players" />
+      {/* On phones the link sits under the card instead of beside the heading. */}
+      <p className="full-link-below"><Link to="/Standings">Full standings →</Link></p>
     </section>
   );
 }
@@ -71,7 +73,6 @@ export default function Home() {
           </p>
           <div className="hero-actions">
             <Link className="btn-gold" to="/Standings">See the {currentSeason} standings</Link>
-            <a className="btn-ghost" href="#players">Meet the players</a>
           </div>
         </div>
         {leader && (
