@@ -38,4 +38,5 @@ test('history page shows every season', () => {
   renderAt('/History', <History />);
   expect(screen.getByText('Season by Season')).toBeInTheDocument();
   expect(screen.getByText('League founded')).toBeInTheDocument();
+  expect(screen.getAllByText('Best win %').length).toBeGreaterThan(0);
 });

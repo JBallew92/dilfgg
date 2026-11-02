@@ -80,6 +80,9 @@ export function standingsFor(season) {
 // The current season's top 10, for the home page cards.
 export const topOfTable = standingsFor(currentSeason).sort(byBelts).slice(0, 10);
 
+// Fewest games a player needs in a season to count for Best win %.
+const MIN_GAMES_FOR_WIN_PCT = 3;
+
 // One summary per season for the History page, oldest first.
 export const seasonSummaries = (() => {
   const seen = new Set();
@@ -87,6 +90,11 @@ export const seasonSummaries = (() => {
     const rows = playerSeasons.filter((p) => p.year === year);
     const leader = [...rows].sort(byBelts)[0];
     const best = rows.reduce((a, b) => (b.min_total_score < a.min_total_score ? b : a));
+    const bestHalf = rows.reduce((a, b) => (b.min_half_time_score < a.min_half_time_score ? b : a));
+    // Best win % needs a few games behind it, so one lucky game doesn't top the season.
+    const regulars = rows.filter((p) => p.games_played >= MIN_GAMES_FOR_WIN_PCT);
+    const topWin = (regulars.length ? regulars : rows).reduce((a, b) =>
+      b.win_pct > a.win_pct || (b.win_pct === a.win_pct && b.games_played > a.games_played) ? b : a);
     const nations = new Set(rows.map((p) => p.nation));
     const newNation = i > 0 && [...nations].some((n) => !seen.has(n));
     nations.forEach((n) => seen.add(n));
@@ -103,6 +111,10 @@ export const seasonSummaries = (() => {
       players: rows.length,
       best: best.min_total_score,
       bestBy: best.name,
+      bestHalf: bestHalf.min_half_time_score,
+      bestHalfBy: bestHalf.name,
+      bestWin: topWin.win_pct,
+      bestWinBy: topWin.name,
       milestone,
     };
   });

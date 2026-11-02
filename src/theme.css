@@ -763,7 +763,7 @@ body {
   width: auto;
 }
 .season-leader {
-  flex: 1 1 220px;
+  flex: 1 1 180px;
   min-width: 0;
 }
 .season-leader .label {
@@ -790,11 +790,16 @@ body {
   width: auto;
 }
 .season-stats {
-  flex: 1 1 320px;
+  flex: 1 1 500px;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
+}
+@media (max-width: 700px) {
+  .season-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 .season-stats dt {
   font-size: 13px;
