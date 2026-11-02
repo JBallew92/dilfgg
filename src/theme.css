@@ -360,17 +360,22 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 6px;
 }
 .carousel-arrow {
-  flex: 0 0 56px;
+  flex: 0 0 44px;
   display: flex;
   justify-content: center;
+}
+.carousel-arrow .round-btn {
+  width: 44px;
+  height: 44px;
+  font-size: 22px;
 }
 .carousel-cards {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
   min-width: 0;
 }
 .ranked-card {
@@ -660,6 +665,49 @@ body {
   border-radius: 4px;
   padding: 1px 6px;
 }
+/* Click a player to see their cards */
+.player-row {
+  cursor: pointer;
+}
+.player-row:hover td,
+.player-row.open td {
+  background: rgba(45, 60, 137, 0.35);
+}
+.name-btn {
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+}
+.name-btn:hover {
+  color: var(--gold);
+}
+.name-btn .chevron {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-left: 4px;
+}
+.standings .player-expand td {
+  text-align: left;
+  border-top: 0;
+  padding: 8px 0 28px;
+  background: rgba(45, 60, 137, 0.2);
+}
+.player-expand .ranked-card .rank {
+  font-size: 18px;
+}
+.expand-inner {
+  /* Stays in view while the table scrolls sideways on small screens. */
+  position: sticky;
+  left: 0;
+  text-align: left;
+}
+
 .updated-note {
   margin: 16px 0 0;
   color: var(--text-muted);

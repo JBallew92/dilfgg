@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import App from './App';
 import Home from './pages/Home';
@@ -39,4 +39,12 @@ test('history page shows every season', () => {
   expect(screen.getByText('Season by Season')).toBeInTheDocument();
   expect(screen.getByText('League founded')).toBeInTheDocument();
   expect(screen.getAllByText('Best win %').length).toBeGreaterThan(0);
+});
+
+test('clicking a player on the standings shows their cards', () => {
+  renderAt('/Standings', <Standings />);
+  const first = screen.getAllByRole('button', { expanded: false })[0];
+  fireEvent.click(first);
+  expect(screen.getAllByRole('button', { expanded: true }).length).toBe(1);
+  expect(document.querySelector('.player-expand .card')).not.toBeNull();
 });

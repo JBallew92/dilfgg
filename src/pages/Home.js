@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PlayerCard from '../components/PlayerCard';
+import CardCarousel from '../components/CardCarousel';
 import { org, topOfTable, currentSeason } from '../league';
 
 const IMG = process.env.PUBLIC_URL + '/images';
@@ -15,30 +16,7 @@ const APP_SHOTS = [
   ['choose-character', 'Choose your character screen with 15 farm pals'],
 ];
 
-// How many cards fit side by side at the current screen width.
-function useCardsPerPage() {
-  const measure = () => {
-    const w = window.innerWidth;
-    if (w >= 1180) return 3;
-    if (w >= 820) return 2;
-    return 1;
-  };
-  const [perPage, setPerPage] = useState(measure);
-  useEffect(() => {
-    const onResize = () => setPerPage(measure());
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-  return perPage;
-}
-
 function CurrentStandings() {
-  const perPage = useCardsPerPage();
-  const [start, setStart] = useState(0);
-  const max = Math.max(0, topOfTable.length - perPage);
-  const first = Math.min(start, max);
-  const visible = topOfTable.slice(first, first + perPage);
-
   return (
     <section id="players" className="wrap section">
       <div className="section-head">
@@ -48,28 +26,7 @@ function CurrentStandings() {
         </div>
         <Link to="/Standings">Full standings →</Link>
       </div>
-      <div className="carousel-row">
-        <div className="carousel-arrow">
-          {first > 0 && (
-            <button type="button" className="round-btn" aria-label="Previous players"
-              onClick={() => setStart(Math.max(0, first - perPage))}>‹</button>
-          )}
-        </div>
-        <div className="carousel-cards">
-          {visible.map((p, i) => (
-            <div className="ranked-card" key={p.name}>
-              <span className="rank">#{first + i + 1}</span>
-              <div className="card-scale"><PlayerCard player={p} /></div>
-            </div>
-          ))}
-        </div>
-        <div className="carousel-arrow">
-          {first < max && (
-            <button type="button" className="round-btn" aria-label="Next players"
-              onClick={() => setStart(Math.min(max, first + perPage))}>›</button>
-          )}
-        </div>
-      </div>
+      <CardCarousel cards={topOfTable} label={(p, i) => `#${i + 1}`} itemName="players" />
     </section>
   );
 }
