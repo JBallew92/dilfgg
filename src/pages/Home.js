@@ -85,13 +85,13 @@ export default function Home() {
 
       <section aria-label="League totals" className="band">
         <div className="wrap totals">
-          <div><div className="total-value">{org['Games Played']}</div><div className="total-label">games played</div></div>
-          <div><div className="total-value">{org['Total Players']}</div><div className="total-label">players</div></div>
-          <div><div className="total-value">{org['Nations']}</div><div className="total-label">nations</div></div>
-          <div><div className="total-value">{org['Winners']}</div><div className="total-label">belt winners</div></div>
+          <div><div className="total-value">{org['Games Played']}</div><div className="total-label">Games Played</div></div>
+          <div><div className="total-value">{org['Total Players']}</div><div className="total-label">Players</div></div>
+          <div><div className="total-value">{org['Nations']}</div><div className="total-label">Nations</div></div>
+          <div><div className="total-value">{org['Winners']}</div><div className="total-label">Belt Winners</div></div>
           <div className="neon">
             <div className="total-value">{org['Total Score'].toLocaleString()}</div>
-            <div className="total-label">Lifetime score</div>
+            <div className="total-label">Lifetime Score</div>
           </div>
         </div>
       </section>
