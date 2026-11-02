@@ -98,6 +98,8 @@ export default function PlayerCard({ player }) {
         </Col>
       </Row>
 
+      <div className="card-baseline" aria-hidden="true" />
+
       {/* Bottom Row: Flag + Stats Bar */}
       <Row className="bottom-bar text-center">
         <Col className="podium-col d-flex justify-content-center align-items-center gap-2">

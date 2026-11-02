@@ -214,7 +214,7 @@ sup {
 /* Player image */
 .card .player-img {
   position: absolute;
-  bottom: 10%;
+  bottom: 13%;
   right: 0.01%;
   padding-left: 5%;
   width: 65%;
@@ -248,8 +248,30 @@ sup {
 /* Flag */
 .card .flag {
  position: absolute;
-  bottom: 10%;
+  bottom: 13%;
   width: 105px;
+}
+
+/* Solid line under the flag and player photo */
+.card .card-baseline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(13% - 4px);
+  height: 4px;
+  background: #2d3c89;
+  z-index: 5;
+}
+
+/* Belts / 2nd / 3rd, centred between that line and the card's frame */
+.card .bottom-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  height: 28px;
+  margin: 0;
+  z-index: 5;
 }
 
 .bottom-bar {
@@ -314,6 +336,3 @@ sup {
   margin: 0 auto;
 }
 
-.player-img {
-  border-bottom: 4px solid #2d3c89;
-}
