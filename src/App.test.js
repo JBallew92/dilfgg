@@ -52,7 +52,7 @@ test('tapping a player in the phone list shows their stats', () => {
 
 test('history shows the champion card for each season', () => {
   renderAt('/History', <History />);
-  expect(screen.getAllByText('DILF Champion').length).toBe(5);
+  expect(screen.getAllByText(/^(DILF|Provisional) Champion$/).length).toBe(5);
   expect(document.querySelectorAll('.season-champ .card').length).toBe(5);
 });
 

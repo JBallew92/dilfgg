@@ -115,14 +115,16 @@ export const seasonSummaries = (() => {
     const newNation = i > 0 && [...nations].some((n) => !seen.has(n));
     nations.forEach((n) => seen.add(n));
     let milestone = '';
+    const inProgress = year === currentSeason && year === new Date().getFullYear();
     if (i === 0) milestone = 'League founded';
-    else if (year === currentSeason && year === new Date().getFullYear()) milestone = 'In progress';
+    else if (inProgress) milestone = 'In progress';
     else if (newNation) milestone = 'Goes international';
     return {
       year,
       leader: leader.name,
       leaderBelts: leader.first,
       card: leader,
+      inProgress,
       photo: getPlayerPhoto(leader.name, year),
       games: rows.reduce((sum, p) => sum + p.first, 0),
       players: rows.length,
