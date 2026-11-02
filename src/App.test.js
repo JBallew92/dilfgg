@@ -24,7 +24,7 @@ beforeAll(() => {
 test('home page shows the hero and the app section', () => {
   renderAt('/', <Home />);
   expect(screen.getByText(/One Belt\./)).toBeInTheDocument();
-  expect(screen.getByText('Top of the Table')).toBeInTheDocument();
+  expect(screen.getByText('Current Standings')).toBeInTheDocument();
   expect(screen.getByText('Online and Offline Play')).toBeInTheDocument();
 });
 
