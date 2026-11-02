@@ -4,52 +4,40 @@
   "homepage": "https://www.dilf.gg",
   "private": true,
   "dependencies": {
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
-    "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.3",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
     "react-router-bootstrap": "^0.26.3",
     "react-router-dom": "^6.30.0",
-    "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "photos": "node scripts/optimize-photos.js",
     "prestart": "node scripts/build-photo-index.js && node scripts/write-build-info.js",
-    "start": "react-scripts start",
+    "start": "vite",
     "prebuild": "node scripts/build-photo-index.js && node scripts/write-build-info.js",
-    "build": "react-scripts build",
+    "build": "vite build",
     "postbuild": "node -e \"require('fs').copyFileSync('build/index.html','build/404.html')\"",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "pretest": "node scripts/build-photo-index.js && node scripts/write-build-info.js",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "test": "vitest run",
+    "preview": "vite preview"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "gh-pages": "^6.3.0",
-    "sharp": "^0.34.5"
+    "jsdom": "^26.1.0",
+    "sharp": "^0.34.5",
+    "vite": "^6.4.5",
+    "vitest": "^3.2.7"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
