@@ -4,6 +4,7 @@ import App from './App';
 import Home from './pages/Home';
 import Standings from './pages/Standings';
 import History from './pages/History';
+import { seasonOf } from './league';
 
 function renderAt(path, page) {
   return render(
@@ -59,4 +60,10 @@ test('history shows the champion card for each season', () => {
 test('standings show places moved since last season', () => {
   renderAt('/Standings', <Standings />);
   expect(document.querySelectorAll('.move.up').length).toBeGreaterThan(0);
+});
+
+test('seasons run December to November', () => {
+  expect(seasonOf(new Date(2026, 10, 30))).toBe(2026);
+  expect(seasonOf(new Date(2026, 11, 1))).toBe(2027);
+  expect(seasonOf(new Date(2027, 0, 15))).toBe(2027);
 });
