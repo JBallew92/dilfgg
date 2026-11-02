@@ -32,7 +32,7 @@ function useCardsPerPage() {
   return perPage;
 }
 
-function TopOfTable() {
+function CurrentStandings() {
   const perPage = useCardsPerPage();
   const [start, setStart] = useState(0);
   const max = Math.max(0, topOfTable.length - perPage);
@@ -44,7 +44,7 @@ function TopOfTable() {
       <div className="section-head">
         <div>
           <p className="eyebrow">{currentSeason} season</p>
-          <h2 className="section-title">Top of the Table</h2>
+          <h2 className="section-title">Current Standings</h2>
         </div>
         <Link to="/Standings">Full standings →</Link>
       </div>
@@ -138,7 +138,7 @@ export default function Home() {
         </div>
       </section>
 
-      <TopOfTable />
+      <CurrentStandings />
 
       <section id="history" className="band">
         <div className="wrap section split">

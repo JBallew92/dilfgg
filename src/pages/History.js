@@ -61,6 +61,8 @@ export default function History() {
                   <div><dt>Games</dt><dd>{s.games}</dd></div>
                   <div><dt>Players</dt><dd>{s.players}</dd></div>
                   <div><dt>Best game</dt><dd>{s.best}</dd><dd className="by">{s.bestBy}</dd></div>
+                  <div><dt>Best half</dt><dd>{s.bestHalf}</dd><dd className="by">{s.bestHalfBy}</dd></div>
+                  <div><dt>Best win %</dt><dd>{s.bestWin}%</dd><dd className="by">{s.bestWinBy}</dd></div>
                 </dl>
               </div>
             </li>
