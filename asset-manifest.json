@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/static/css/main.f9f6e680.css",
-    "main.js": "/static/js/main.62df7804.js",
+    "main.css": "/static/css/main.0204313f.css",
+    "main.js": "/static/js/main.40eb6e73.js",
     "static/js/206.6797299c.chunk.js": "/static/js/206.6797299c.chunk.js",
     "static/media/Race Sport.ttf": "/static/media/Race Sport.4d151853419b5a7771b3.ttf",
     "index.html": "/index.html"
   },
   "entrypoints": [
-    "static/css/main.f9f6e680.css",
-    "static/js/main.62df7804.js"
+    "static/css/main.0204313f.css",
+    "static/js/main.40eb6e73.js"
   ]
 }
