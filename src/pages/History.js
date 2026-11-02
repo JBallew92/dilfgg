@@ -1,4 +1,5 @@
 import { org, seasons, seasonSummaries } from '../league';
+import PlayerCard from '../components/PlayerCard';
 import { getPlayerPhoto, DEFAULT_PHOTO } from '../photos';
 
 const ASSETS = process.env.PUBLIC_URL + '/images/assets';
@@ -46,24 +47,20 @@ export default function History() {
                 {s.milestone && <div className="milestone">{s.milestone}</div>}
               </div>
               <div className="season-body">
-                <div className="season-photo" style={cardBack}>
-                  <img src={s.photo} alt={s.leader} loading="lazy" onError={fallback} />
+                <div className="season-champ">
+                  <div className="gold-label">DILF Champion</div>
+                  <div className="card-scale"><PlayerCard player={s.card} /></div>
                 </div>
-                <div className="season-leader">
-                  <div className="label">Most belts</div>
-                  <div className="who">{s.leader}</div>
-                  <div className="belts">
-                    <img src={`${ASSETS}/belt-icon.webp`} alt="" />
-                    {s.leaderBelts}
-                  </div>
+                <div className="season-recap">
+                  <h3 className="gold-label">Seasonal Recap</h3>
+                  <dl className="season-stats">
+                    <div><dt>Games</dt><dd>{s.games}</dd></div>
+                    <div><dt>Players</dt><dd>{s.players}</dd></div>
+                    <div><dt>Best game</dt><dd>{s.best}</dd><dd className="by">{s.bestBy}</dd></div>
+                    <div><dt>Best half</dt><dd>{s.bestHalf}</dd><dd className="by">{s.bestHalfBy}</dd></div>
+                    <div><dt>Best win %</dt><dd>{s.bestWin}%</dd><dd className="by">{s.bestWinBy}</dd></div>
+                  </dl>
                 </div>
-                <dl className="season-stats">
-                  <div><dt>Games</dt><dd>{s.games}</dd></div>
-                  <div><dt>Players</dt><dd>{s.players}</dd></div>
-                  <div><dt>Best game</dt><dd>{s.best}</dd><dd className="by">{s.bestBy}</dd></div>
-                  <div><dt>Best half</dt><dd>{s.bestHalf}</dd><dd className="by">{s.bestHalfBy}</dd></div>
-                  <div><dt>Best win %</dt><dd>{s.bestWin}%</dd><dd className="by">{s.bestWinBy}</dd></div>
-                </dl>
               </div>
             </li>
           ))}
