@@ -22,7 +22,7 @@ export default function History() {
       <section className="wrap history-intro">
         <div className="copy">
           <p className="eyebrow">Our history</p>
-          <h1>From One Game to a Federation</h1>
+          <h1>From One Game to<br className="on-desktop" /> a Federation</h1>
           <p>
             The Dominoes International League Federation was founded in 2022 outside of Portland,
             Oregon. Our highly competitive family decided playing dominoes simply wasn't enough, so
