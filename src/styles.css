@@ -255,8 +255,9 @@ sup {
 /* Solid line under the flag and player photo */
 .card .card-baseline {
   position: absolute;
-  left: 0;
-  right: 0;
+  /* Lines up with the flag's left edge, same gap on the right */
+  left: 13px;
+  right: 13px;
   bottom: calc(13% - 4px);
   height: 4px;
   background: #2d3c89;
