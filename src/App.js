@@ -26,8 +26,9 @@ function App() {
  return (
   <div className="site">
     <ScrollManager />
+    <a className="skip-link" href="#main">Skip to content</a>
     <SiteNav />
-    <main>
+    <main id="main" tabIndex={-1}>
       <Outlet />
     </main>
     <SiteFooter />

@@ -1049,3 +1049,41 @@ body {
   color: var(--text-soft);
   margin: 0 0 28px;
 }
+
+/* Accessibility: a clear focus ring for keyboard users, a skip link, and
+   calmer motion for people who ask their device for less of it */
+.site a:focus-visible,
+.site button:focus-visible,
+.site select:focus-visible,
+.site [tabindex]:focus-visible {
+  outline: 3px solid var(--gold, #e2d98a);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+.site main:focus {
+  outline: none;
+}
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -60px;
+  z-index: 1000;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #e2d98a;
+  color: #0a0d18;
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site *,
+  .site *::before,
+  .site *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
