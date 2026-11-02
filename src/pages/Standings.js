@@ -36,7 +36,6 @@ export default function Standings() {
       <div className="standings-head">
         <div>
           <h1 className="page-title">Standings</h1>
-          <p>Ranked by belts won. In Chickenfoot the lowest score wins, so lower averages are better.</p>
         </div>
         <div role="group" aria-label="Season" className="chips">
           {seasons.map((y) => (
