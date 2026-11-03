@@ -10,4 +10,6 @@ const build = path.join(__dirname, '..', 'build');
 const index = path.join(build, 'index.html');
 
 fs.copyFileSync(index, path.join(build, '404.html'));
-for (const route of ROUTES) fs.copyFileSync(index, path.join(build, `${route}.html`));
+// Pages paths are case sensitive, so cover the lowercase spelling too (/submit).
+const ALL = [...ROUTES, ...ROUTES.map((r) => r.toLowerCase())];
+for (const route of ALL) fs.copyFileSync(index, path.join(build, `${route}.html`));
