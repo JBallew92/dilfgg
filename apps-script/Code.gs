@@ -77,6 +77,7 @@ var CARD_SCHEMA = {
   type: 'object',
   properties: {
     game_date: { type: 'string', description: 'Date written on the card as YYYY-MM-DD, or empty' },
+    halftime_after: { type: 'integer', description: 'Rounds written above the halftime or subtotal line' },
     players: {
       type: 'array',
       items: {
@@ -94,7 +95,7 @@ var CARD_SCHEMA = {
       },
     },
   },
-  required: ['game_date', 'players'],
+  required: ['game_date', 'halftime_after', 'players'],
   additionalProperties: false,
 };
 
@@ -113,6 +114,7 @@ function cardPrompt_(roster) {
     '- halftime_written: the halftime or subtotal number written on the card (0 if there is none)',
     '- total_written: the total written on the card (0 if there is none)',
     '- unsure: true if any number in the column was hard to read',
+    '- halftime_after (top level): how many rounds are written above the halftime/subtotal line, usually 6 or 7',
     'Also return game_date (YYYY-MM-DD) if a date is written on the card, otherwise an empty string.',
     'Report the numbers as written, even if they do not add up.',
     '',

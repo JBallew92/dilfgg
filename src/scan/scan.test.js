@@ -1,5 +1,5 @@
 import { pickName, rankNames } from './nameMatch';
-import { checkPlayer, gameProblems } from './scoreCheck';
+import { analyzePlayer, gameProblems } from './scoreCheck';
 import { exifDate } from './image';
 
 const ROSTER = ['Kat Herzog', 'Katie Herzog', 'Kristen Herzog', 'Dave Herzog', 'Dan Herzog',
@@ -23,18 +23,18 @@ test("Claude's match wins when it is on the roster", () => {
   expect(pickName('Zed', 'NEW', ROSTER)).toBe('');
 });
 
-test('the add-up check flags rounds that do not match the total', () => {
-  // James on the lined-paper sample: the 17 under his name is not in the written totals.
-  const james = { half: '123', total: '290', rounds: [17, 0, 0, 8, 11, 70, 34, 75, 30, 0, 49, 0, 13] };
-  expect(checkPlayer(james)).toEqual([
-    "The first-half rounds don't add up to the half time score of 123.",
-    'The rounds read from the card add up to 307, but the total says 290.',
-  ]);
-  // Kat on the Mexican Train sheet: first half fine (subtotal after 6 rounds), total wrong on the card.
-  const kat = { half: '129', total: '429', rounds: [29, 26, 14, 11, 24, 25, 5, 16, 26, 31, 34, 34, 57] };
-  expect(checkPlayer(kat)).toEqual(['The rounds read from the card add up to 332, but the total says 429.']);
+test('the add-up check explains card math errors and misreads', () => {
+  // James on the lined paper: halftime after 7 rounds, the 17 was left out of the written scores.
+  const james = { half: '123', total: '290', split: 7, rounds: [17, 0, 0, 8, 11, 70, 34, 75, 30, 0, 49, 0, 13] };
+  expect(analyzePlayer(james)).toMatchObject({ kind: 'math', fix: { half: 140, total: 307 } });
+  // Kat on the Mexican Train sheet: half time right, total added up wrong.
+  const kat = { half: '129', total: '429', split: 6, rounds: [29, 26, 14, 11, 24, 25, 5, 16, 26, 31, 34, 34, 57] };
+  expect(analyzePlayer(kat)).toMatchObject({ kind: 'math', fix: { half: 129, total: 332 } });
+  // A misread round: neither score fits, so no fix is offered.
+  const aven = { half: '200', total: '469', split: 6, rounds: [69, 30, 20, 30, 30, 30, 30, 30, 30, 30, 30, 30, 50] };
+  expect(analyzePlayer(aven)).toMatchObject({ kind: 'read', fix: null });
   const dave = { half: '123', total: '332', rounds: [27, 5, 4, 48, 15, 24, 71, 0, 0, 47, 28, 12, 51] };
-  expect(checkPlayer(dave)).toEqual([]);
+  expect(analyzePlayer(dave)).toBeNull();
 });
 
 test('the form needs a date, 2 to 8 named players and whole scores', () => {

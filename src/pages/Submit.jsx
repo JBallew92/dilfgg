@@ -4,7 +4,7 @@ import { GAME_FORM_URL, NEW_TAB, NewTab, SCAN_ENDPOINT } from '../links';
 import { callScanner } from '../scan/api';
 import { photoDate, shrinkPhoto, today } from '../scan/image';
 import { pickName, rankNames } from '../scan/nameMatch';
-import { checkPlayer, gameProblems } from '../scan/scoreCheck';
+import { analyzePlayer, gameProblems } from '../scan/scoreCheck';
 
 const CODE_KEY = 'dilf-league-code';
 const EMAIL_KEY = 'dilf-email';
@@ -23,7 +23,9 @@ const saveEmail = (email) => {
   try { localStorage.setItem(EMAIL_KEY, email); } catch { /* private browsing */ }
 };
 
-const blankPlayer = () => ({ name: '', written: '', half: '', total: '', rounds: null, unsure: false });
+const blankPlayer = () => ({
+  name: '', written: '', half: '', total: '', rounds: null, split: null, unsure: false, checked: false,
+});
 
 export default function Submit() {
   const [code, setCode] = useState(readCode);
@@ -64,7 +66,9 @@ export default function Submit() {
           half: p.halftime_written ? String(p.halftime_written) : '',
           total: p.total_written ? String(p.total_written) : '',
           rounds: p.rounds,
+          split: reading.halftime_after || null,
           unsure: p.unsure,
+          checked: false,
         }))
         : [blankPlayer(), blankPlayer()];
       setGame((g) => ({ ...g, date: (reading && reading.game_date) || taken || today(), players }));
@@ -220,7 +224,7 @@ function ReviewStep({ photo, readNote, game, setGame, roster, error, sending, on
   const remove = (i) => setGame((g) => ({ ...g, players: g.players.filter((_, j) => j !== i) }));
   const add = () => setGame((g) => ({ ...g, players: [...g.players, blankPlayer()] }));
   const flagged = game.players
-    .map((p, i) => (checkPlayer(p).length ? p.name || p.written || `Player ${i + 1}` : null))
+    .map((p, i) => (analyzePlayer(p) && !p.checked ? p.name || p.written || `Player ${i + 1}` : null))
     .filter(Boolean);
 
   return (
@@ -238,8 +242,8 @@ function ReviewStep({ photo, readNote, game, setGame, roster, error, sending, on
         )}
         {flagged.length > 0 && (
           <p className="form-note" role="status">
-            {flagged.length === 1 ? `${flagged[0]}'s numbers don't` : `${flagged.length} players' numbers don't`} add
-            up. Check the gold notes against the card before you submit.
+            {flagged.length === 1 ? `${flagged[0]} needs a look.` : `${flagged.length} players need a look.`}{' '}
+            Everyone else adds up.
           </p>
         )}
         <div className="field-row">
@@ -287,11 +291,11 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
       : [];
   }, [player.written, player.name, roster]);
   const isNew = player.name.trim() && !roster.includes(player.name.trim());
-  const warnings = checkPlayer(player);
-  const roundsSum = Array.isArray(player.rounds) && player.rounds.length === 13
-    ? player.rounds.reduce((a, b) => a + Number(b || 0), 0)
-    : null;
+  const issue = analyzePlayer(player);
+  const open = issue && !player.checked;
   const flag = player.unsure ? ' unsure' : '';
+  // Any edit to the numbers re-runs the check.
+  const edit = (patch) => onChange({ ...patch, checked: false });
 
   return (
     <li className="player-fields">
@@ -319,25 +323,54 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
         <div>
           <label htmlFor={`half-${n}`}>Half time</label>
           <input id={`half-${n}`} className={`score-input${flag}`} inputMode="numeric" pattern="[0-9]*"
-            value={player.half} onChange={(e) => onChange({ half: e.target.value.replace(/\D/g, '') })} />
+            value={player.half} onChange={(e) => edit({ half: e.target.value.replace(/\D/g, '') })} />
         </div>
         <div>
           <label htmlFor={`total-${n}`}>Total</label>
           <input id={`total-${n}`} className={`score-input${flag}`} inputMode="numeric" pattern="[0-9]*"
-            value={player.total} onChange={(e) => onChange({ total: e.target.value.replace(/\D/g, '') })} />
+            value={player.total} onChange={(e) => edit({ total: e.target.value.replace(/\D/g, '') })} />
         </div>
       </div>
-      {warnings.length > 0 && (
-        <div className="form-warn">
-          {warnings.map((w) => <p key={w}>{w}</p>)}
-          <p>Check this column on the card. The total is saved exactly as entered above.</p>
-          {roundsSum !== null && roundsSum !== Number(player.total) && (
-            <button type="button" className="chip" onClick={() => onChange({ total: String(roundsSum) })}>
-              Use {roundsSum}, the rounds added up
+      {open && (
+        <div className={`addup ${issue.kind}`}>
+          <span className={`status ${issue.kind}`}>{issue.kind === 'math' ? 'Card math' : 'Check a round'}</span>
+          <RoundsStrip n={n} player={player} issue={issue}
+            onRound={(r, v) => edit({ rounds: player.rounds.map((x, k) => (k === r ? v : x)) })} />
+          <p className="explain">{issue.message}</p>
+          <div className="addup-actions">
+            {issue.fix && (
+              <button type="button" className="chip primary"
+                onClick={() => onChange({ half: String(issue.fix.half), total: String(issue.fix.total), checked: true })}>
+                {issue.fix.half === Number(player.half) ? `Use ${issue.fix.total}` : `Use ${issue.fix.half} / ${issue.fix.total}`}
+              </button>
+            )}
+            <button type="button" className="chip" onClick={() => onChange({ checked: true })}>
+              Keep {player.half} / {player.total}
             </button>
-          )}
+          </div>
         </div>
       )}
+      {issue && player.checked && <p className="checked-note">Checked against the card.</p>}
     </li>
+  );
+}
+
+// The 13 rounds as read, with the halftime written in after round 6 or 7.
+// Each round can be corrected in place.
+function RoundsStrip({ n, player, issue, onRound }) {
+  const cells = player.rounds.map((v, r) => (
+    <td key={r}>
+      <input aria-label={`Player ${n} round ${r + 1}`} inputMode="numeric" pattern="[0-9]*"
+        value={v} onChange={(e) => onRound(r, Number(e.target.value.replace(/\D/g, '') || 0))} />
+    </td>
+  ));
+  cells.splice(issue.split, 0, <td key="half" className="sub">{player.half}</td>);
+  return (
+    <div className="rounds">
+      <table>
+        <caption>Rounds as read · halftime after round {issue.split} · tap a number to fix it</caption>
+        <tbody><tr>{cells}</tr></tbody>
+      </table>
+    </div>
   );
 }

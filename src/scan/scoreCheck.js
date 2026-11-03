@@ -1,23 +1,40 @@
-// Checks one player's numbers the way a careful scorekeeper would.
-// Returns a list of plain-language warnings (empty when everything adds up).
-export function checkPlayer({ half, total, rounds }) {
-  const warnings = [];
+const add = (list) => list.reduce((a, b) => a + Number(b || 0), 0);
+
+// Works out whether a player's rounds agree with the half time and total
+// written on the card, and if not, whether the card's math or the scan is the
+// likely culprit. Returns null when there's nothing to check or it all adds up.
+//   kind 'math': the rounds are consistent, a written number was added up wrong
+//   kind 'read': both halves disagree, so a round was probably misread
+export function analyzePlayer({ half, total, rounds, split }) {
+  if (!Array.isArray(rounds) || rounds.length !== 13 || half === '' || total === '') return null;
   const h = Number(half);
   const t = Number(total);
-  if (half !== '' && total !== '' && t < h) warnings.push('Total is less than the half time score.');
-  if (Array.isArray(rounds) && rounds.length === 13) {
-    const add = (list) => list.reduce((a, b) => a + Number(b || 0), 0);
-    // Cards put the halftime line after 6 or 7 rounds, depending on the layout.
-    const firstHalves = [add(rounds.slice(0, 6)), add(rounds.slice(0, 7))];
-    if (half !== '' && !firstHalves.includes(h)) {
-      warnings.push(`The first-half rounds don't add up to the half time score of ${h}.`);
-    }
-    const sum = add(rounds);
-    if (total !== '' && sum !== t) {
-      warnings.push(`The rounds read from the card add up to ${sum}, but the total says ${t}.`);
-    }
+  // Cards draw the halftime line after 6 or 7 rounds. Use what the scan saw,
+  // else whichever split matches the written half time.
+  const at = split === 6 || split === 7 ? split : add(rounds.slice(0, 7)) === h ? 7 : 6;
+  const first = add(rounds.slice(0, at));
+  const second = add(rounds.slice(at));
+  const base = { split: at, first, second };
+  const halfOk = first === h;
+  const totalOk = t === h + second;
+  if (halfOk && totalOk) return null;
+  if (halfOk) {
+    return {
+      ...base, kind: 'math', fix: { half: h, total: h + second },
+      message: `The half time is right, but the second half adds to ${second}. So the total should be ${h + second}, not ${t}. It looks like the card was added up wrong.`,
+    };
   }
-  return warnings;
+  if (totalOk) {
+    return {
+      ...base, kind: 'math', fix: { half: first, total: first + second },
+      message: `The first ${at} rounds add to ${first}, not ${h}, and the total was built on ${h}. Corrected: half time ${first}, total ${first + second}.`,
+    };
+  }
+  const off = Math.abs(first - h);
+  return {
+    ...base, kind: 'read', fix: null,
+    message: `The first half adds to ${first}, but the card says ${h}. That's off by ${off}, so one of the first ${at} rounds was probably misread. Tap a round below to fix it.`,
+  };
 }
 
 // Problems that stop the form from being sent.

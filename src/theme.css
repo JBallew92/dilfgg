@@ -1159,24 +1159,96 @@ body {
   color: #ff9b9b;
   font-weight: 600;
 }
-.form-warn {
+/* Add-up check on the review screen */
+.addup {
   margin-top: 12px;
-  padding: 10px 12px;
-  border-left: 3px solid var(--gold);
+  padding: 12px;
+  border-radius: 10px;
   background: var(--bg);
+  border: 1px solid var(--line);
+}
+.addup.math {
+  border-left: 3px solid #f2b35a;
+}
+.addup.read {
+  border-left: 3px solid #f07a6b;
+}
+.addup .status {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.addup .status.math {
+  color: #f2b35a;
+  background: rgba(242, 179, 90, 0.12);
+}
+.addup .status.read {
+  color: #f07a6b;
+  background: rgba(240, 122, 107, 0.14);
+}
+.addup .rounds {
+  overflow-x: auto;
+}
+.addup table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.addup caption {
+  caption-side: top;
+  padding-bottom: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.addup td {
+  padding: 0;
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.addup td.sub {
+  padding: 0 6px;
+  background: var(--surface);
   color: var(--gold);
+  font-weight: 700;
   font-size: 14px;
 }
-.form-warn p {
-  margin: 0 0 6px;
-}
-.form-warn p + p {
+.scan-page .addup td input {
+  width: 2.6em;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--text-soft);
+  font-size: 14px;
+  text-align: center;
 }
-.form-warn .chip {
-  margin-top: 4px;
+.addup .explain {
+  margin: 10px 0;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+.addup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.addup-actions .chip {
   border-color: var(--gold);
   color: var(--gold);
+  font-weight: 600;
+}
+.addup-actions .chip.primary {
+  background: var(--gold);
+  color: var(--bg);
+}
+.checked-note {
+  margin: 8px 0 0;
+  color: #7fd1a0;
+  font-size: 14px;
 }
 .form-note {
   padding: 10px 12px;
