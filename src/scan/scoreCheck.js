@@ -6,7 +6,13 @@ export function checkPlayer({ half, total, rounds }) {
   const t = Number(total);
   if (half !== '' && total !== '' && t < h) warnings.push('Total is less than the half time score.');
   if (Array.isArray(rounds) && rounds.length === 13) {
-    const sum = rounds.reduce((a, b) => a + Number(b || 0), 0);
+    const add = (list) => list.reduce((a, b) => a + Number(b || 0), 0);
+    // Cards put the halftime line after 6 or 7 rounds, depending on the layout.
+    const firstHalves = [add(rounds.slice(0, 6)), add(rounds.slice(0, 7))];
+    if (half !== '' && !firstHalves.includes(h)) {
+      warnings.push(`The first-half rounds don't add up to the half time score of ${h}.`);
+    }
+    const sum = add(rounds);
     if (total !== '' && sum !== t) {
       warnings.push(`The rounds read from the card add up to ${sum}, but the total says ${t}.`);
     }
