@@ -18,7 +18,7 @@
     "start": "vite",
     "prebuild": "node scripts/build-photo-index.js && node scripts/write-build-info.js",
     "build": "vite build",
-    "postbuild": "node -e \"require('fs').copyFileSync('build/index.html','build/404.html')\"",
+    "postbuild": "node scripts/copy-route-pages.js",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "pretest": "node scripts/build-photo-index.js && node scripts/write-build-info.js",
