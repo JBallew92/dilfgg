@@ -200,7 +200,12 @@ function submit_(req, props) {
     lock.releaseLock();
   }
 
-  notify_(props, game, players);
+  // The row is already saved; a failed email must not make the player submit again.
+  try {
+    notify_(props, game, players);
+  } catch (e) {
+    console.warn('Notify email failed: ' + e);
+  }
   return json_({ ok: true });
 }
 
