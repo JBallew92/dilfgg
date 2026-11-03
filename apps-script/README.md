@@ -34,9 +34,11 @@ so the URL stays the same.
 ## What It Writes
 
 One row per game, matched to the sheet's own column headers, so column order doesn't matter:
-Timestamp, Email Address ("dilf.gg scan" when left blank), game date, number of players,
-each player's name / half time / total, and the Drive link to the card photo in
-"Upload a picture of the scorecard". The nightly `statsload.py` import picks it up like a
+Timestamp, Email Address (required on the page), game date, number of players,
+each player's name / half time / total, the Drive link to the card photo in
+"Upload a picture of the scorecard", and "Scanner" in a **Submitted Via** column. The
+script adds that column at the end of the header row the first time it runs; Google Form
+rows leave it blank. The nightly `statsload.py` import picks it up like a
 form response.
 
 ## Cost

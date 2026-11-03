@@ -15,9 +15,10 @@ export function checkPlayer({ half, total, rounds }) {
 }
 
 // Problems that stop the form from being sent.
-export function gameProblems({ date, players }) {
+export function gameProblems({ date, email = '', players }) {
   const problems = [];
   if (!date) problems.push('Enter the game date.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) problems.push('Enter your email address.');
   if (players.length < 2 || players.length > 8) problems.push('A game needs 2 to 8 players.');
   const seen = new Set();
   players.forEach((p, i) => {

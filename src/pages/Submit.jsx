@@ -7,6 +7,7 @@ import { pickName, rankNames } from '../scan/nameMatch';
 import { checkPlayer, gameProblems } from '../scan/scoreCheck';
 
 const CODE_KEY = 'dilf-league-code';
+const EMAIL_KEY = 'dilf-email';
 const KNOWN = [...new Set(playerRows.map((r) => r.Player))].sort();
 
 const readCode = () => {
@@ -14,6 +15,12 @@ const readCode = () => {
 };
 const saveCode = (code) => {
   try { localStorage.setItem(CODE_KEY, code); } catch { /* private browsing */ }
+};
+const readEmail = () => {
+  try { return localStorage.getItem(EMAIL_KEY) || ''; } catch { return ''; }
+};
+const saveEmail = (email) => {
+  try { localStorage.setItem(EMAIL_KEY, email); } catch { /* private browsing */ }
 };
 
 const blankPlayer = () => ({ name: '', written: '', half: '', total: '', rounds: null, unsure: false });
@@ -36,7 +43,7 @@ export default function Submit() {
 
   const [photo, setPhoto] = useState(null); // { dataUrl, url }
   const [readNote, setReadNote] = useState('');
-  const [game, setGame] = useState({ date: today(), email: '', players: [blankPlayer(), blankPlayer()] });
+  const [game, setGame] = useState({ date: today(), email: readEmail(), players: [blankPlayer(), blankPlayer()] });
   const [sent, setSent] = useState(null);
 
   async function onPhoto(file) {
@@ -72,7 +79,7 @@ export default function Submit() {
   function typeByHand() {
     setPhoto(null);
     setReadNote('');
-    setGame({ date: today(), email: '', players: [blankPlayer(), blankPlayer()] });
+    setGame((g) => ({ date: today(), email: g.email, players: [blankPlayer(), blankPlayer()] }));
     setStep('review');
   }
 
@@ -83,12 +90,13 @@ export default function Submit() {
     setStep('sending');
     const payload = {
       date: game.date,
-      email: game.email,
+      email: game.email.trim(),
       photoUrl: photo && photo.url,
       players: game.players.map((p) => ({ name: p.name.trim(), half: Number(p.half), total: Number(p.total) })),
     };
     try {
       await callScanner('submit', { code, game: payload });
+      saveEmail(payload.email);
       setSent(payload);
       setStep('done');
     } catch (e) {
@@ -101,7 +109,7 @@ export default function Submit() {
     setPhoto(null);
     setSent(null);
     setError('');
-    setGame({ date: today(), email: '', players: [blankPlayer(), blankPlayer()] });
+    setGame((g) => ({ date: today(), email: g.email, players: [blankPlayer(), blankPlayer()] }));
     setStep('capture');
   }
 
@@ -213,7 +221,7 @@ function ReviewStep({ photo, readNote, game, setGame, roster, error, sending, on
   const add = () => setGame((g) => ({ ...g, players: [...g.players, blankPlayer()] }));
 
   return (
-    <form className="review" onSubmit={(e) => { e.preventDefault(); onSend(); }}>
+    <form className="review" noValidate onSubmit={(e) => { e.preventDefault(); onSend(); }}>
       {photo && (
         <a className="review-photo" href={photo.url || photo.dataUrl} {...NEW_TAB}>
           <img src={photo.dataUrl} alt="Your score card photo" />
@@ -243,8 +251,8 @@ function ReviewStep({ photo, readNote, game, setGame, roster, error, sending, on
         )}
 
         <div className="field-row">
-          <label htmlFor="game-email">Your email <span className="optional">(optional)</span></label>
-          <input id="game-email" type="email" value={game.email} autoComplete="email"
+          <label htmlFor="game-email">Your email</label>
+          <input id="game-email" type="email" required value={game.email} autoComplete="email"
             onChange={(e) => setGame((g) => ({ ...g, email: e.target.value }))} />
         </div>
 

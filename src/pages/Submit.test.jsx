@@ -21,6 +21,7 @@ const reading = {
 };
 
 beforeEach(() => {
+  localStorage.clear();
   localStorage.setItem('dilf-league-code', 'dominoes');
   global.fetch = vi.fn(async (url, opts) => {
     const body = JSON.parse(opts.body);
@@ -43,6 +44,7 @@ test('a scanned card fills the form and submits the scores', async () => {
   expect(screen.getByRole('button', { name: 'Katie Herzog' })).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: 'Kat Herzog' }));
+  fireEvent.change(screen.getByLabelText('Your email'), { target: { value: 'james@example.com' } });
   fireEvent.click(screen.getByRole('button', { name: 'Submit Game' }));
 
   await screen.findByText('Game Saved');
@@ -52,10 +54,12 @@ test('a scanned card fills the form and submits the scores', async () => {
     code: 'dominoes',
     game: {
       date: '2026-05-26',
+      email: 'james@example.com',
       photoUrl: 'https://drive.example/card',
       players: [{ name: 'James Ballew', half: 116, total: 155 }, { name: 'Kat Herzog', half: 129, total: 429 }],
     },
   });
+  expect(localStorage.getItem('dilf-email')).toBe('james@example.com');
 });
 
 test('a missing name stops the submit', async () => {
@@ -63,5 +67,6 @@ test('a missing name stops the submit', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Type scores without a photo' }));
   fireEvent.click(screen.getByRole('button', { name: 'Submit Game' }));
   await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Player 1 needs a name.'));
+  expect(screen.getByRole('alert')).toHaveTextContent('Enter your email address.');
   expect(global.fetch.mock.calls.every((c) => JSON.parse(c[1].body).action !== 'submit')).toBe(true);
 });

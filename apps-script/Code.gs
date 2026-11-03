@@ -19,7 +19,8 @@ var MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 var DEFAULT_DAILY_SCANS = 30;
 var DEFAULT_DAILY_SUBMITS = 20;
 var PHOTO_FOLDER_NAME = 'DILF Score Cards';
-var NO_EMAIL = 'dilf.gg scan';
+var SOURCE_HEADER = 'Submitted Via';
+var SOURCE_VALUE = 'Scanner';
 
 function doGet() {
   return json_({ ok: true, service: 'dilf-score-scan' });
@@ -172,6 +173,7 @@ function submit_(req, props) {
   lock.waitLock(20000);
   try {
     var sheet = scoresSheet_(props);
+    ensureSourceColumn_(sheet);
     var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     var row = headers.map(function () { return ''; });
     var set = function (header, value) {
@@ -180,7 +182,8 @@ function submit_(req, props) {
       row[i] = value;
     };
     set('Timestamp', new Date());
-    if (headers.indexOf('Email Address') !== -1) set('Email Address', String(game.email || '').trim() || NO_EMAIL);
+    set('Email Address', String(game.email).trim());
+    set(SOURCE_HEADER, SOURCE_VALUE);
     set('What day was the game played?', parseDate_(game.date));
     set('How many players?', players.length);
     players.forEach(function (p, i) {
@@ -202,6 +205,7 @@ function submit_(req, props) {
 function checkGame_(game, players) {
   if (players.length < 2 || players.length > 8) return 'A game needs 2 to 8 players.';
   if (!parseDate_(game.date)) return 'Please enter the game date.';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(game.email || '').trim())) return 'Please enter your email address.';
   var seen = {};
   for (var i = 0; i < players.length; i++) {
     var p = players[i] || {};
@@ -214,6 +218,14 @@ function checkGame_(game, players) {
     if (total < half) return name + "'s total can't be less than their half time score.";
   }
   return '';
+}
+
+// Adds the "Submitted Via" column at the end of the header row the first time,
+// so scanner rows can be told apart from Google Form rows (which leave it blank).
+function ensureSourceColumn_(sheet) {
+  var last = sheet.getLastColumn();
+  var headers = sheet.getRange(1, 1, 1, last).getValues()[0];
+  if (headers.indexOf(SOURCE_HEADER) === -1) sheet.getRange(1, last + 1).setValue(SOURCE_HEADER);
 }
 
 function isWholeScore_(n) {
