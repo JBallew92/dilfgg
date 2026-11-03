@@ -40,6 +40,8 @@ export async function photoDate(file) {
   }
 }
 
+export const LATE_NIGHT_CUTOFF = 6;
+
 export function exifDate(view) {
   if (view.getUint16(0) !== 0xffd8) return '';
   let off = 2;
@@ -74,9 +76,13 @@ function tiffDate(view, start) {
     if (entry === -1) continue;
     const at = start + u32(entry + 8);
     let s = '';
-    for (let i = 0; i < 10; i++) s += String.fromCharCode(view.getUint8(at + i));
-    const m = /^(\d{4}):(\d{2}):(\d{2})$/.exec(s);
-    if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+    for (let i = 0; i < 19 && at + i < view.byteLength; i++) s += String.fromCharCode(view.getUint8(at + i));
+    const m = /^(\d{4}):(\d{2}):(\d{2})(?: (\d{2}))?/.exec(s);
+    if (!m) continue;
+    // Games run late: a photo taken before 6 AM belongs to the night before.
+    const day = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    if (m[4] !== undefined && +m[4] < LATE_NIGHT_CUTOFF) day.setUTCDate(day.getUTCDate() - 1);
+    return day.toISOString().slice(0, 10);
   }
   return '';
 }

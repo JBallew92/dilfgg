@@ -52,12 +52,13 @@ test('the form needs a date, 2 to 8 named players and whole scores', () => {
   expect(newbie('Teressa Smith')).toEqual([]);
 });
 
-test('reads the date a JPEG photo was taken', () => {
+test('reads the game date from when a JPEG photo was taken', () => {
   // Minimal JPEG: SOI, APP1 Exif with one IFD0 entry (DateTime, ASCII, 20 bytes).
   const date = '2024:03:03 04:37:57\0';
   const tiff = [0x4d, 0x4d, 0, 42, 0, 0, 0, 8, 0, 1, 0x01, 0x32, 0, 2, 0, 0, 0, 20, 0, 0, 0, 26, 0, 0, 0, 0,
     ...[...date].map((c) => c.charCodeAt(0))];
   const app1 = [0x45, 0x78, 0x69, 0x66, 0, 0, ...tiff];
   const bytes = [0xff, 0xd8, 0xff, 0xe1, 0, app1.length + 2, ...app1];
-  expect(exifDate(new DataView(new Uint8Array(bytes).buffer))).toBe('2024-03-03');
+  // Taken at 4:37 AM, so it counts as the night before (the sheet has this game on 3/2/2024).
+  expect(exifDate(new DataView(new Uint8Array(bytes).buffer))).toBe('2024-03-02');
 });
