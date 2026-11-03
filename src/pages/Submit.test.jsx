@@ -72,16 +72,23 @@ test('a missing name stops the submit', async () => {
 });
 
 test('+ New player fills in a LastName to type over', async () => {
+  reading.players.push({ name_on_card: 'Zed', matched_name: 'NEW', rounds: [], halftime_written: 10, total_written: 20, unsure: false });
   const { container } = render(<MemoryRouter><Submit /></MemoryRouter>);
   fireEvent.change(container.querySelector('input[capture]'), { target: { files: [new File(['x'], 'card.jpg')] } });
   await screen.findByDisplayValue('James Ballew');
-  fireEvent.click(screen.getByRole('button', { name: '+ New player “Kat”' }));
-  const box = screen.getByLabelText('Player 2 name');
-  expect(box).toHaveValue('Kat LastName');
+  reading.players.pop();
+  // Kat is a known first name, so only Zed gets the new-player bubble.
+  expect(screen.queryByRole('button', { name: '+ New player “Kat”' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '+ New player “Zed”' }));
+  const box = screen.getByLabelText('Player 3 name');
+  expect(box).toHaveValue('Zed LastName');
   await waitFor(() => expect(box).toHaveFocus());
   expect([box.selectionStart, box.selectionEnd]).toEqual([4, 12]);
+  expect(screen.getByText('New player')).toBeInTheDocument();
 
+  fireEvent.click(screen.getByRole('button', { name: 'Kat Herzog' }));
+  expect(screen.getByRole('button', { name: '✓ Kat Herzog' })).toHaveAttribute('aria-pressed', 'true');
   fireEvent.change(screen.getByLabelText('Your email'), { target: { value: 'james@example.com' } });
   fireEvent.click(screen.getByRole('button', { name: 'Submit Game' }));
-  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Type Kat\'s last name in place of "LastName".'));
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Type Zed\'s last name in place of "LastName".'));
 });

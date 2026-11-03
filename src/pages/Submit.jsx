@@ -324,17 +324,29 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
       {index === 0 && (
         <datalist id="known-players">{roster.map((r) => <option key={r} value={r} />)}</datalist>
       )}
-      {(suggestions.length > 0 || isNew || first) && (
-        <div className="name-chips">
-          {isNew && <span className="new-tag">New player</span>}
-          {suggestions.map((s) => (
-            <button key={s} type="button" className="chip" onClick={() => onChange({ name: s })}>{s}</button>
-          ))}
-          {first && !isNew && first.toLowerCase() !== player.name.trim().split(/\s+/)[0].toLowerCase() && (
-            <button type="button" className="chip add-new" onClick={addNew}>+ New player “{first}”</button>
-          )}
-        </div>
-      )}
+      {(() => {
+        const current = player.name.trim();
+        // Offer a new player only when no one on the roster has the first name on the card.
+        const known = roster.some((r) => r.split(/\s+/)[0].toLowerCase() === first.toLowerCase());
+        const showNew = first && !isNew && !known;
+        // Only show bubbles when there's a choice; the selected one is gold.
+        if (!suggestions.length && !showNew) return isNew ? <div className="name-chips"><span className="new-tag">New player</span></div> : null;
+        return (
+          <div className="name-chips">
+            {current && (
+              <button type="button" className="chip" aria-pressed="true">
+                ✓ {current}{isNew ? ' · New player' : ''}
+              </button>
+            )}
+            {suggestions.map((s) => (
+              <button key={s} type="button" className="chip" aria-pressed="false" onClick={() => onChange({ name: s })}>{s}</button>
+            ))}
+            {showNew && (
+              <button type="button" className="chip add-new" aria-pressed="false" onClick={addNew}>+ New player “{first}”</button>
+            )}
+          </div>
+        );
+      })()}
       <div className="score-pair">
         <div>
           <label htmlFor={`half-${n}`}>Half time</label>

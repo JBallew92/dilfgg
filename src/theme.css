@@ -1495,3 +1495,10 @@ body {
     text-align: center;
   }
 }
+
+.scan-page .name-chips .chip[aria-pressed='true'] {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--bg);
+  cursor: default;
+}
