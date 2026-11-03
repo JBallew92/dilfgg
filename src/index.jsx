@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-d
 import Home from './pages/Home';
 import Standings from './pages/Standings';
 import History from './pages/History';
+import Submit from './pages/Submit';
 import FormSubmission from './FormSubmission';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -19,6 +20,7 @@ root.render(
           <Route path="/" element={<Home />} />
           <Route path="/Standings" element={<Standings />} />
           <Route path="/History" element={<History />} />
+          <Route path="/Submit" element={<Submit />} />
           <Route path="/FormSubmission" element={<FormSubmission />} />
           {/* Old links to the player cards page */}
           <Route path="/Stats" element={<Navigate to="/Standings" replace />} />
