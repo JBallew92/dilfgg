@@ -5,6 +5,10 @@ export const GAME_FORM_URL =
 export const PHOTO_FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLSey8Qo12SB1c4ILGwX00c4K-q7OrzGuDVd65UbCSTO8-CwjqA/viewform';
 
+// The Apps Script web app behind the Submit a Game page (see apps-script/README.md).
+// Empty until it is deployed; the page then points players to the Google Form.
+export const SCAN_ENDPOINT = '';
+
 export const NEW_TAB = { target: '_blank', rel: 'noopener noreferrer' };
 
 // The arrow shown after links that open a new tab, with the same warning
