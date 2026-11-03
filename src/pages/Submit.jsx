@@ -219,6 +219,9 @@ function ReviewStep({ photo, readNote, game, setGame, roster, error, sending, on
   }));
   const remove = (i) => setGame((g) => ({ ...g, players: g.players.filter((_, j) => j !== i) }));
   const add = () => setGame((g) => ({ ...g, players: [...g.players, blankPlayer()] }));
+  const flagged = game.players
+    .map((p, i) => (checkPlayer(p).length ? p.name || p.written || `Player ${i + 1}` : null))
+    .filter(Boolean);
 
   return (
     <form className="review" noValidate onSubmit={(e) => { e.preventDefault(); onSend(); }}>
@@ -232,6 +235,12 @@ function ReviewStep({ photo, readNote, game, setGame, roster, error, sending, on
         {readNote && <p className="form-note">{readNote}</p>}
         {photo && !readNote && (
           <p className="hint">Check each name and score against the card. Gold boxes were hard to read.</p>
+        )}
+        {flagged.length > 0 && (
+          <p className="form-note" role="status">
+            {flagged.length === 1 ? `${flagged[0]}'s numbers don't` : `${flagged.length} players' numbers don't`} add
+            up. Check the gold notes against the card before you submit.
+          </p>
         )}
         <div className="field-row">
           <label htmlFor="game-date">Game date</label>
@@ -279,6 +288,9 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
   }, [player.written, player.name, roster]);
   const isNew = player.name.trim() && !roster.includes(player.name.trim());
   const warnings = checkPlayer(player);
+  const roundsSum = Array.isArray(player.rounds) && player.rounds.length === 13
+    ? player.rounds.reduce((a, b) => a + Number(b || 0), 0)
+    : null;
   const flag = player.unsure ? ' unsure' : '';
 
   return (
@@ -315,7 +327,17 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
             value={player.total} onChange={(e) => onChange({ total: e.target.value.replace(/\D/g, '') })} />
         </div>
       </div>
-      {warnings.map((w) => <p key={w} className="form-warn">{w} Please check the card.</p>)}
+      {warnings.length > 0 && (
+        <div className="form-warn">
+          {warnings.map((w) => <p key={w}>{w}</p>)}
+          <p>Check this column on the card. The total is saved exactly as entered above.</p>
+          {roundsSum !== null && roundsSum !== Number(player.total) && (
+            <button type="button" className="chip" onClick={() => onChange({ total: String(roundsSum) })}>
+              Use {roundsSum}, the rounds added up
+            </button>
+          )}
+        </div>
+      )}
     </li>
   );
 }

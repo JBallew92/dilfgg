@@ -1160,9 +1160,23 @@ body {
   font-weight: 600;
 }
 .form-warn {
-  margin: 8px 0 0;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--gold);
+  background: var(--bg);
   color: var(--gold);
   font-size: 14px;
+}
+.form-warn p {
+  margin: 0 0 6px;
+}
+.form-warn p + p {
+  color: var(--text-soft);
+}
+.form-warn .chip {
+  margin-top: 4px;
+  border-color: var(--gold);
+  color: var(--gold);
 }
 .form-note {
   padding: 10px 12px;
