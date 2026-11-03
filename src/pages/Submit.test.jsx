@@ -92,3 +92,17 @@ test('+ New player fills in a LastName to type over', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Submit Game' }));
   await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Type Zed\'s last name in place of "LastName".'));
 });
+
+test('the rounds stay visible for every scanned player, before and after a fix', async () => {
+  const { container } = render(<MemoryRouter><Submit /></MemoryRouter>);
+  fireEvent.change(container.querySelector('input[capture]'), { target: { files: [new File(['x'], 'card.jpg')] } });
+  await screen.findByDisplayValue('James Ballew');
+  const round1 = screen.getByLabelText('Player 1 round 1');
+  expect(screen.getByText('Adds up')).toBeInTheDocument();
+  fireEvent.change(round1, { target: { value: '' } });
+  expect(screen.getByLabelText('Player 1 round 1')).toHaveValue('');
+  expect(screen.queryByText('Adds up')).toBeNull();
+  fireEvent.change(screen.getByLabelText('Player 1 round 1'), { target: { value: '71' } });
+  expect(screen.getByText('Adds up')).toBeInTheDocument();
+  expect(screen.getByLabelText('Player 1 round 13')).toBeInTheDocument();
+});

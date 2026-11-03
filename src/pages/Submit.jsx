@@ -4,7 +4,7 @@ import { GAME_FORM_URL, NEW_TAB, NewTab, SCAN_ENDPOINT } from '../links';
 import { callScanner } from '../scan/api';
 import { photoDate, shrinkPhoto, today } from '../scan/image';
 import { pickName, rankNames } from '../scan/nameMatch';
-import { LAST_NAME, analyzePlayer, gameProblems } from '../scan/scoreCheck';
+import { LAST_NAME, analyzePlayer, gameProblems, hasRounds, splitAt } from '../scan/scoreCheck';
 
 const CODE_KEY = 'dilf-league-code';
 const EMAIL_KEY = 'dilf-email';
@@ -327,7 +327,7 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
       {(() => {
         const current = player.name.trim();
         // Offer a new player only when no one on the roster has the first name on the card.
-        const known = roster.some((r) => r.split(/\s+/)[0].toLowerCase() === first.toLowerCase());
+        const known = roster.some((r) => r.toLowerCase().split(/[\s-]+/)[0] === first.toLowerCase().split('-')[0]);
         const showNew = first && !isNew && !known;
         // Only show bubbles when there's a choice; the selected one is gold.
         if (!suggestions.length && !showNew) return isNew ? <div className="name-chips"><span className="new-tag">New player</span></div> : null;
@@ -359,43 +359,47 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
             value={player.total} onChange={(e) => edit({ total: e.target.value.replace(/\D/g, '') })} />
         </div>
       </div>
-      {open && (
-        <div className={`addup ${issue.kind}`}>
-          <span className={`status ${issue.kind}`}>{issue.kind === 'math' ? 'Card math' : 'Check a round'}</span>
-          <RoundsStrip n={n} player={player} issue={issue}
+      {hasRounds(player) && (
+        <div className={`addup ${open ? issue.kind : 'ok'}`}>
+          <span className={`status ${open ? issue.kind : 'ok'}`}>
+            {open ? (issue.kind === 'math' ? 'Card math' : 'Check a round') : issue ? 'Checked' : 'Adds up'}
+          </span>
+          <RoundsStrip n={n} player={player} split={issue ? issue.split : splitAt(player)}
             onRound={(r, v) => edit({ rounds: player.rounds.map((x, k) => (k === r ? v : x)) })} />
-          <p className="explain">{issue.message}</p>
-          <div className="addup-actions">
-            {issue.fix && (
-              <button type="button" className="chip primary"
-                onClick={() => onChange({ half: String(issue.fix.half), total: String(issue.fix.total), checked: true })}>
-                {issue.fix.half === Number(player.half) ? `Use ${issue.fix.total}` : `Use ${issue.fix.half} / ${issue.fix.total}`}
+          {open && <p className="explain">{issue.message}</p>}
+          {open && (
+            <div className="addup-actions">
+              {issue.fix && (
+                <button type="button" className="chip primary"
+                  onClick={() => onChange({ half: String(issue.fix.half), total: String(issue.fix.total), checked: true })}>
+                  {issue.fix.half === Number(player.half) ? `Use ${issue.fix.total}` : `Use ${issue.fix.half} / ${issue.fix.total}`}
+                </button>
+              )}
+              <button type="button" className="chip" onClick={() => onChange({ checked: true })}>
+                Keep {player.half} / {player.total}
               </button>
-            )}
-            <button type="button" className="chip" onClick={() => onChange({ checked: true })}>
-              Keep {player.half} / {player.total}
-            </button>
-          </div>
+            </div>
+          )}
+          {issue && player.checked && <p className="checked-note">Kept as written. You checked it against the card.</p>}
         </div>
       )}
-      {issue && player.checked && <p className="checked-note">Checked against the card.</p>}
     </li>
   );
 }
 
 // The 13 rounds as read, with the halftime written in after round 6 or 7.
 // Each round can be corrected in place.
-function RoundsStrip({ n, player, issue, onRound }) {
+function RoundsStrip({ n, player, split, onRound }) {
   const cell = (r) => (
     <td key={r}>
       <input aria-label={`Player ${n} round ${r + 1}`} inputMode="numeric" pattern="[0-9]*"
-        value={player.rounds[r]} onChange={(e) => onRound(r, Number(e.target.value.replace(/\D/g, '') || 0))} />
+        value={player.rounds[r]} onChange={(e) => onRound(r, e.target.value.replace(/\D/g, ''))} />
     </td>
   );
   const all = player.rounds.map((_, r) => r);
   const halves = [
-    { label: 'Half', card: player.half, rounds: all.slice(0, issue.split) },
-    { label: 'Total', card: player.total, rounds: all.slice(issue.split) },
+    { label: 'Half', card: player.half, rounds: all.slice(0, split) },
+    { label: 'Total', card: player.total, rounds: all.slice(split) },
   ];
   const width = Math.max(...halves.map((h) => h.rounds.length));
   return (

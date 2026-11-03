@@ -5,13 +5,21 @@ const add = (list) => list.reduce((a, b) => a + Number(b || 0), 0);
 // likely culprit. Returns null when there's nothing to check or it all adds up.
 //   kind 'math': the rounds are consistent, a written number was added up wrong
 //   kind 'read': both halves disagree, so a round was probably misread
-export function analyzePlayer({ half, total, rounds, split }) {
-  if (!Array.isArray(rounds) || rounds.length !== 13 || half === '' || total === '') return null;
+// Cards draw the halftime line after 6 or 7 rounds. Use what the scan saw,
+// else whichever split matches the written half time.
+export function splitAt({ half, rounds, split }) {
+  if (split === 6 || split === 7) return split;
+  return add(rounds.slice(0, 7)) === Number(half) ? 7 : 6;
+}
+
+export const hasRounds = (player) => Array.isArray(player.rounds) && player.rounds.length === 13;
+
+export function analyzePlayer(player) {
+  const { half, total, rounds } = player;
+  if (!hasRounds(player) || half === '' || total === '') return null;
   const h = Number(half);
   const t = Number(total);
-  // Cards draw the halftime line after 6 or 7 rounds. Use what the scan saw,
-  // else whichever split matches the written half time.
-  const at = split === 6 || split === 7 ? split : add(rounds.slice(0, 7)) === h ? 7 : 6;
+  const at = splitAt(player);
   const first = add(rounds.slice(0, at));
   const second = add(rounds.slice(at));
   const base = { split: at, first, second };

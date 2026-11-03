@@ -1173,6 +1173,13 @@ body {
 .addup.read {
   border-left: 3px solid #f07a6b;
 }
+.addup.ok {
+  border-left: 3px solid #7fd1a0;
+}
+.addup .status.ok {
+  color: #7fd1a0;
+  background: rgba(127, 209, 160, 0.12);
+}
 .addup .status {
   display: inline-block;
   margin-bottom: 8px;
