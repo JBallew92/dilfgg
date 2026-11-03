@@ -263,7 +263,10 @@ function notify_(props, game, players) {
 // ---------- helpers ----------
 
 function scoresSheet_(props) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  // Bound scripts use their own sheet; a standalone script needs SHEET_ID.
+  var id = props.getProperty('SHEET_ID');
+  var ss = id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) throw new Error('Open Apps Script from the scores sheet, or set SHEET_ID.');
   var name = props.getProperty('SHEET_NAME');
   var sheet = name ? ss.getSheetByName(name) : ss.getSheets()[0];
   if (!sheet) throw new Error('No sheet named ' + name);

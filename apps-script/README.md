@@ -18,6 +18,7 @@ real games have gone through cleanly.
    | `ANTHROPIC_API_KEY` | Yes | Key from console.anthropic.com (set a monthly spend limit there) |
    | `LEAGUE_CODE` | Yes | The code players type once on their phone |
    | `NOTIFY_EMAIL` | No | Gets an email with the scores and photo link for every game |
+   | `SHEET_ID` | No | Only if the script wasn't opened from the sheet: the long ID in the sheet's URL |
    | `SHEET_NAME` | No | Tab to write to. Defaults to the first tab (the form responses) |
    | `DAILY_SCAN_LIMIT` | No | Defaults to 30 scans a day |
    | `DAILY_SUBMIT_LIMIT` | No | Defaults to 20 games a day |
