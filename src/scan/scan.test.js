@@ -38,7 +38,7 @@ test('the add-up check explains card math errors and misreads', () => {
 });
 
 test('the form needs a date, 2 to 8 named players and whole scores', () => {
-  const ok = { date: '2026-05-26', email: 'a@b.co', players: [{ name: 'A', half: '1', total: '2' }, { name: 'B', half: '3', total: '4' }] };
+  const ok = { date: '2026-05-26', email: 'a@b.co', roster: ['A', 'B', 'a'], players: [{ name: 'A', half: '1', total: '2' }, { name: 'B', half: '3', total: '4' }] };
   expect(gameProblems(ok)).toEqual([]);
   expect(gameProblems({ ...ok, date: '' })).toContain('Enter the game date.');
   expect(gameProblems({ ...ok, email: '' })).toContain('Enter your email address.');
@@ -46,6 +46,10 @@ test('the form needs a date, 2 to 8 named players and whole scores', () => {
   expect(gameProblems({ ...ok, players: [ok.players[0]] })).toContain('A game needs 2 to 8 players.');
   expect(gameProblems({ ...ok, players: [ok.players[0], { name: 'a', half: '5', total: '1' }] }))
     .toEqual(['a is listed twice.', "a's total can't be less than their half time score."]);
+  const newbie = (name) => gameProblems({ ...ok, players: [ok.players[0], { name, half: '3', total: '4' }] });
+  expect(newbie('Teressa LastName')).toEqual(['Type Teressa\'s last name in place of "LastName".']);
+  expect(newbie('Teressa')).toEqual(['Add a last name for Teressa.']);
+  expect(newbie('Teressa Smith')).toEqual([]);
 });
 
 test('reads the date a JPEG photo was taken', () => {

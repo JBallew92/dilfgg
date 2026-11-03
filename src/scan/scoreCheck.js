@@ -37,8 +37,11 @@ export function analyzePlayer({ half, total, rounds, split }) {
   };
 }
 
+// Placeholder put in the name box for a new player, so the last name gets typed in.
+export const LAST_NAME = 'LastName';
+
 // Problems that stop the form from being sent.
-export function gameProblems({ date, email = '', players }) {
+export function gameProblems({ date, email = '', players, roster = [] }) {
   const problems = [];
   if (!date) problems.push('Enter the game date.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) problems.push('Enter your email address.');
@@ -47,6 +50,8 @@ export function gameProblems({ date, email = '', players }) {
   players.forEach((p, i) => {
     const label = p.name || `Player ${i + 1}`;
     if (!p.name.trim()) problems.push(`Player ${i + 1} needs a name.`);
+    else if (p.name.includes(LAST_NAME)) problems.push(`Type ${p.name.split(' ')[0]}'s last name in place of "${LAST_NAME}".`);
+    else if (!roster.includes(p.name.trim()) && !/\S\s+\S/.test(p.name.trim())) problems.push(`Add a last name for ${p.name.trim()}.`);
     else if (seen.has(p.name.trim().toLowerCase())) problems.push(`${p.name} is listed twice.`);
     seen.add(p.name.trim().toLowerCase());
     if (!/^\d+$/.test(String(p.half)) || !/^\d+$/.test(String(p.total))) {

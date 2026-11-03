@@ -70,3 +70,18 @@ test('a missing name stops the submit', async () => {
   expect(screen.getByRole('alert')).toHaveTextContent('Enter your email address.');
   expect(global.fetch.mock.calls.every((c) => JSON.parse(c[1].body).action !== 'submit')).toBe(true);
 });
+
+test('+ New player fills in a LastName to type over', async () => {
+  const { container } = render(<MemoryRouter><Submit /></MemoryRouter>);
+  fireEvent.change(container.querySelector('input[capture]'), { target: { files: [new File(['x'], 'card.jpg')] } });
+  await screen.findByDisplayValue('James Ballew');
+  fireEvent.click(screen.getByRole('button', { name: '+ New player “Kat”' }));
+  const box = screen.getByLabelText('Player 2 name');
+  expect(box).toHaveValue('Kat LastName');
+  await waitFor(() => expect(box).toHaveFocus());
+  expect([box.selectionStart, box.selectionEnd]).toEqual([4, 12]);
+
+  fireEvent.change(screen.getByLabelText('Your email'), { target: { value: 'james@example.com' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Submit Game' }));
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Type Kat\'s last name in place of "LastName".'));
+});

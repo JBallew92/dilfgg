@@ -4,7 +4,7 @@ import { GAME_FORM_URL, NEW_TAB, NewTab, SCAN_ENDPOINT } from '../links';
 import { callScanner } from '../scan/api';
 import { photoDate, shrinkPhoto, today } from '../scan/image';
 import { pickName, rankNames } from '../scan/nameMatch';
-import { analyzePlayer, gameProblems } from '../scan/scoreCheck';
+import { LAST_NAME, analyzePlayer, gameProblems } from '../scan/scoreCheck';
 
 const CODE_KEY = 'dilf-league-code';
 const EMAIL_KEY = 'dilf-email';
@@ -62,6 +62,7 @@ export default function Submit() {
       const players = reading && reading.players.length
         ? reading.players.slice(0, 8).map((p) => ({
           name: pickName(p.name_on_card, p.matched_name, roster),
+          picked: pickName(p.name_on_card, p.matched_name, roster),
           written: p.name_on_card,
           half: p.halftime_written ? String(p.halftime_written) : '',
           total: p.total_written ? String(p.total_written) : '',
@@ -88,7 +89,7 @@ export default function Submit() {
   }
 
   async function send() {
-    const problems = gameProblems(game);
+    const problems = gameProblems({ ...game, roster });
     if (problems.length) { setError(problems.join(' ')); return; }
     setError('');
     setStep('sending');
@@ -286,16 +287,28 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
   const suggestions = useMemo(() => {
     const basis = player.written || player.name;
     // Only close matches, so a confident pick doesn't come with random extras.
-    return basis
-      ? rankNames(basis, roster, 3).filter((s) => s.score <= 3).map((s) => s.name).filter((s) => s !== player.name)
-      : [];
-  }, [player.written, player.name, roster]);
+    const close = basis ? rankNames(basis, roster, 3).filter((s) => s.score <= 3).map((s) => s.name) : [];
+    // Keep the name the scan picked on offer, so switching to a new player can be undone.
+    return [...new Set([player.picked, ...close])].filter((s) => s && s !== player.name);
+  }, [player.written, player.name, player.picked, roster]);
   const isNew = player.name.trim() && !roster.includes(player.name.trim());
   const issue = analyzePlayer(player);
   const open = issue && !player.checked;
   const flag = player.unsure ? ' unsure' : '';
   // Any edit to the numbers re-runs the check.
   const edit = (patch) => onChange({ ...patch, checked: false });
+  const nameRef = useRef(null);
+  const first = (player.written || '').trim().split(/\s+/)[0];
+  // New player: fill "First LastName" and select LastName so they type over it.
+  const addNew = () => {
+    onChange({ name: `${first} ${LAST_NAME}` });
+    setTimeout(() => {
+      const box = nameRef.current;
+      if (!box) return;
+      box.focus();
+      box.setSelectionRange(first.length + 1, box.value.length);
+    }, 0);
+  };
 
   return (
     <li className="player-fields">
@@ -305,18 +318,21 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
         {onRemove && <button type="button" className="link-btn" onClick={onRemove}>Remove</button>}
       </div>
       <label className="visually-hidden" htmlFor={`name-${n}`}>Player {n} name</label>
-      <input id={`name-${n}`} className="name-input" list="known-players" value={player.name}
+      <input id={`name-${n}`} ref={nameRef} className="name-input" list="known-players" value={player.name}
         placeholder="First and last name" autoComplete="off"
         onChange={(e) => onChange({ name: e.target.value })} />
       {index === 0 && (
         <datalist id="known-players">{roster.map((r) => <option key={r} value={r} />)}</datalist>
       )}
-      {(suggestions.length > 0 || isNew) && (
+      {(suggestions.length > 0 || isNew || first) && (
         <div className="name-chips">
           {isNew && <span className="new-tag">New player</span>}
           {suggestions.map((s) => (
             <button key={s} type="button" className="chip" onClick={() => onChange({ name: s })}>{s}</button>
           ))}
+          {first && !isNew && first.toLowerCase() !== player.name.trim().split(/\s+/)[0].toLowerCase() && (
+            <button type="button" className="chip add-new" onClick={addNew}>+ New player “{first}”</button>
+          )}
         </div>
       )}
       <div className="score-pair">
