@@ -7,8 +7,9 @@ Website for the Dominoes International League Federation.
 Player photos must be `.png` files. Other formats (like `.jpg`) are skipped.
 
 1. Save the photo in `public/images/profile_pics` named `First Last YEAR.png`, e.g. `James Ballew 2026.png`.
-2. Run `npm run photos`. It shrinks the photo to a small `.webp` and removes the full-size original.
-3. Commit the new `.webp` file.
+2. That's it: the nightly job (`scripts/nightly.ps1`) keeps a copy of the original in `G:\dilf\photo-originals`, shrinks it to a small `.webp`, and publishes it with the next stats update.
+
+To do it by hand instead, run `npm run photos` (needs Node.js 20 or newer) and commit the new `.webp` file.
 
 A player with no photo for a season shows their most recent earlier photo, and the default silhouette if they have none.
 

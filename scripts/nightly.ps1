@@ -1,12 +1,18 @@
 # Nightly stats update for dilf.gg
 #
-# Exports the latest stats from the league database and pushes them to the
-# main branch on GitHub. GitHub Actions (.github/workflows/deploy.yml) then
+# Exports the latest stats from the league database, shrinks any new player
+# photos, and pushes both to the main branch on GitHub. GitHub Actions (.github/workflows/deploy.yml) then
 # tests, builds and publishes the site, so this PC no longer needs Node/npm.
 #
 # Usage (PowerShell):
 #   G:\dilf\dilf-app-v2\scripts\nightly.ps1           # normal nightly run
 #   G:\dilf\dilf-app-v2\scripts\nightly.ps1 -DryRun   # everything except the push
+#
+# New player photo: save it as "First Last YEAR.png" in
+#   G:\dilf\dilf-app-v2\public\images\profile_pics
+# The next nightly run copies the original to G:\dilf\photo-originals,
+# converts it to a small .webp (npm run photos) and publishes it. Node.js is
+# only needed on nights when there is a new photo.
 #
 # Logs: G:\dilf\logs\nightly-YYYY-MM-DD.log (kept for 30 days)
 #
@@ -31,6 +37,8 @@ $pythonScripts = @(
 $packages = @("gspread", "psycopg2", "pandas", "oauth2client", "dotenv", "sqlalchemy")
 $siteRepo = "G:\dilf\dilf-app-v2"
 $statsFiles = @("src/playerStats.js", "src/orgStats.js")
+$photoDir = "$siteRepo\public\images\profile_pics"
+$photoOriginals = "G:\dilf\photo-originals"
 $logDir = "G:\dilf\logs"
 $keepLogsDays = 30
 # -----------------------------------
@@ -69,19 +77,56 @@ try {
         if ($LASTEXITCODE -ne 0) { throw "$script failed (exit code $LASTEXITCODE)" }
     }
 
-    # ---------- 4. Push changed stats; GitHub deploys the site ----------
+    # ---------- 4. Shrink any new player photos ----------
+    # A problem here is logged but does not stop the stats update; the
+    # photo stays in the folder and is tried again the next night.
+    $newPhotos = @(Get-ChildItem -Path $photoDir -Filter "*.png" -File)
+    $photosDone = $false
+    if ($newPhotos.Count -gt 0) {
+        Write-Host "New photos: $($newPhotos.Name -join ', ')"
+        if ($DryRun) {
+            Write-Host "DRY RUN: skipping photo conversion."
+        } else {
+            try {
+                New-Item -ItemType Directory -Force -Path $photoOriginals | Out-Null
+                foreach ($photo in $newPhotos) {
+                    Copy-Item -Path $photo.FullName -Destination $photoOriginals -Force
+                }
+                Push-Location $siteRepo
+                try {
+                    npm ci --no-audit --no-fund
+                    if ($LASTEXITCODE -ne 0) { throw "npm ci failed" }
+                    npm run photos
+                    if ($LASTEXITCODE -ne 0) { throw "npm run photos failed" }
+                } finally {
+                    Pop-Location
+                }
+                $photosDone = $true
+            }
+            catch {
+                Write-Host "WARNING: photo step failed, will retry tomorrow: $_"
+            }
+        }
+    }
+
+    # ---------- 5. Push changes; GitHub deploys the site ----------
     git -C $siteRepo add -- $statsFiles
+    if ($photosDone) {
+        git -C $siteRepo add -- "public/images/profile_pics/*.webp"
+    }
     git -C $siteRepo diff --cached --quiet
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "No stats changes today. Nothing to push."
+        Write-Host "No stats or photo changes today. Nothing to push."
     } else {
         Write-Host "Changed files:"
         git -C $siteRepo diff --cached --stat
         if ($DryRun) {
             Write-Host "DRY RUN: skipping commit and push. Undoing the staging."
-            git -C $siteRepo reset --quiet -- $statsFiles
+            git -C $siteRepo reset --quiet
         } else {
-            git -C $siteRepo commit -m "Nightly stats update $(Get-Date -Format yyyy-MM-dd)"
+            $message = "Nightly stats update $(Get-Date -Format yyyy-MM-dd)"
+            if ($photosDone) { $message += " with new player photos" }
+            git -C $siteRepo commit -m $message
             if ($LASTEXITCODE -ne 0) { throw "git commit failed" }
             git -C $siteRepo push origin main
             if ($LASTEXITCODE -ne 0) { throw "git push failed" }
