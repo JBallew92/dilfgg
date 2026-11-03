@@ -1191,34 +1191,57 @@ body {
   color: #f07a6b;
   background: rgba(240, 122, 107, 0.14);
 }
-.addup .rounds {
-  overflow-x: auto;
+.addup .rounds-note {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: 12px;
 }
 .addup table {
+  width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
 }
-.addup caption {
-  caption-side: top;
-  padding-bottom: 4px;
+.addup tbody + tbody tr.round-nums th {
+  padding-top: 10px;
+}
+.addup th {
+  padding: 0 0 2px;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+.addup th[scope='row'] {
+  width: 4.4em;
+  padding-right: 6px;
+  text-align: left;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+.addup th.sub {
+  width: 3.2em;
+  color: var(--gold);
 }
 .addup td {
   padding: 0;
   border: 1px solid var(--line);
   text-align: center;
 }
+.addup td.pad {
+  border: 0;
+}
 .addup td.sub {
-  padding: 0 6px;
   background: var(--surface);
   color: var(--gold);
   font-weight: 700;
   font-size: 14px;
 }
 .scan-page .addup td input {
-  width: 2.6em;
-  padding: 4px 2px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 0;
   border: 0;
   border-radius: 0;
   background: transparent;

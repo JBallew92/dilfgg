@@ -358,18 +358,38 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
 // The 13 rounds as read, with the halftime written in after round 6 or 7.
 // Each round can be corrected in place.
 function RoundsStrip({ n, player, issue, onRound }) {
-  const cells = player.rounds.map((v, r) => (
+  const cell = (r) => (
     <td key={r}>
       <input aria-label={`Player ${n} round ${r + 1}`} inputMode="numeric" pattern="[0-9]*"
-        value={v} onChange={(e) => onRound(r, Number(e.target.value.replace(/\D/g, '') || 0))} />
+        value={player.rounds[r]} onChange={(e) => onRound(r, Number(e.target.value.replace(/\D/g, '') || 0))} />
     </td>
-  ));
-  cells.splice(issue.split, 0, <td key="half" className="sub">{player.half}</td>);
+  );
+  const all = player.rounds.map((_, r) => r);
+  const halves = [
+    { label: 'Half', card: player.half, rounds: all.slice(0, issue.split) },
+    { label: 'Total', card: player.total, rounds: all.slice(issue.split) },
+  ];
+  const width = Math.max(...halves.map((h) => h.rounds.length));
   return (
     <div className="rounds">
+      <p className="rounds-note">Rounds as read from the card. Tap a score to fix it.</p>
       <table>
-        <caption>Rounds as read · halftime after round {issue.split} · tap a number to fix it</caption>
-        <tbody><tr>{cells}</tr></tbody>
+        {halves.map((h) => (
+          <tbody key={h.label}>
+            <tr className="round-nums">
+              <th scope="row">Round</th>
+              {h.rounds.map((r) => <th key={r} scope="col">{r + 1}</th>)}
+              {Array.from({ length: width - h.rounds.length }, (_, k) => <th key={`pad${k}`} aria-hidden="true" />)}
+              <th scope="col" className="sub">{h.label}</th>
+            </tr>
+            <tr>
+              <th scope="row">Score</th>
+              {h.rounds.map(cell)}
+              {Array.from({ length: width - h.rounds.length }, (_, k) => <td key={`pad${k}`} className="pad" />)}
+              <td className="sub">{h.card}</td>
+            </tr>
+          </tbody>
+        ))}
       </table>
     </div>
   );

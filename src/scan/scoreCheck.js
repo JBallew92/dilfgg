@@ -33,7 +33,7 @@ export function analyzePlayer({ half, total, rounds, split }) {
   const off = Math.abs(first - h);
   return {
     ...base, kind: 'read', fix: null,
-    message: `The first half adds to ${first}, but the card says ${h}. That's off by ${off}, so one of the first ${at} rounds was probably misread. Tap a round below to fix it.`,
+    message: `The first half adds to ${first}, but the card says ${h}. That's off by ${off}, so one of the first ${at} rounds was probably misread. Tap a round above to fix it.`,
   };
 }
 
