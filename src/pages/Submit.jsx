@@ -360,9 +360,9 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
         </div>
       </div>
       {hasRounds(player) && (
-        <div className={`addup ${open ? issue.kind : 'ok'}`}>
-          <span className={`status ${open ? issue.kind : 'ok'}`}>
-            {open ? (issue.kind === 'math' ? 'Card math' : 'Check a round') : issue ? 'Checked' : 'Adds up'}
+        <div className={`addup ${open ? 'error' : 'ok'}`}>
+          <span className={`status ${open ? 'error' : 'ok'}`}>
+            {open ? 'Score Error' : issue ? 'Checked' : 'Adds up'}
           </span>
           <RoundsStrip n={n} player={player} split={issue ? issue.split : splitAt(player)}
             onRound={(r, v) => edit({ rounds: player.rounds.map((x, k) => (k === r ? v : x)) })} />
