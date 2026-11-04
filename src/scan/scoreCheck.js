@@ -41,7 +41,7 @@ export function analyzePlayer(player) {
   const off = Math.abs(first - h);
   return {
     ...base, kind: 'read', fix: { half: first, total: first + second },
-    message: `The first half adds to ${first}, but the card says ${h}. Tap the misread round to fix it.`,
+    message: `The first half adds to ${first}, but the card says ${h}.`,
   };
 }
 
