@@ -29,19 +29,19 @@ export function analyzePlayer(player) {
   if (halfOk) {
     return {
       ...base, kind: 'math', fix: { half: h, total: h + second },
-      message: `The half time is right, but the second half adds to ${second}. So the total should be ${h + second}, not ${t}. It looks like the card was added up wrong.`,
+      message: `The second half adds to ${second}, so the total should be ${h + second}, not ${t}.`,
     };
   }
   if (totalOk) {
     return {
       ...base, kind: 'math', fix: { half: first, total: first + second },
-      message: `The first ${at} rounds add to ${first}, not ${h}, and the total was built on ${h}. Corrected: half time ${first}, total ${first + second}.`,
+      message: `The first ${at} rounds add to ${first}, not ${h}. That makes it ${first} / ${first + second}.`,
     };
   }
   const off = Math.abs(first - h);
   return {
-    ...base, kind: 'read', fix: null,
-    message: `The first half adds to ${first}, but the card says ${h}. That's off by ${off}, so one of the first ${at} rounds was probably misread. Tap a round above to fix it.`,
+    ...base, kind: 'read', fix: { half: first, total: first + second },
+    message: `The first half adds to ${first}, but the card says ${h}.`,
   };
 }
 
