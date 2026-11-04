@@ -1167,10 +1167,7 @@ body {
   background: var(--bg);
   border: 1px solid var(--line);
 }
-.addup.math {
-  border-left: 3px solid #f2b35a;
-}
-.addup.read {
+.addup.error {
   border-left: 3px solid #f07a6b;
 }
 .addup.ok {
@@ -1190,11 +1187,7 @@ body {
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-.addup .status.math {
-  color: #f2b35a;
-  background: rgba(242, 179, 90, 0.12);
-}
-.addup .status.read {
+.addup .status.error {
   color: #f07a6b;
   background: rgba(240, 122, 107, 0.14);
 }
