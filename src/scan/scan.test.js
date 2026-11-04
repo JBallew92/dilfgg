@@ -30,9 +30,9 @@ test('the add-up check explains card math errors and misreads', () => {
   // Kat on the Mexican Train sheet: half time right, total added up wrong.
   const kat = { half: '129', total: '429', split: 6, rounds: [29, 26, 14, 11, 24, 25, 5, 16, 26, 31, 34, 34, 57] };
   expect(analyzePlayer(kat)).toMatchObject({ kind: 'math', fix: { half: 129, total: 332 } });
-  // A misread round: neither score fits, so no fix is offered.
+  // A misread round: neither score fits; the rounds' own sums are offered as a fallback.
   const aven = { half: '200', total: '469', split: 6, rounds: [69, 30, 20, 30, 30, 30, 30, 30, 30, 30, 30, 30, 50] };
-  expect(analyzePlayer(aven)).toMatchObject({ kind: 'read', fix: null });
+  expect(analyzePlayer(aven)).toMatchObject({ kind: 'read', fix: { half: 209, total: 439 } });
   const dave = { half: '123', total: '332', rounds: [27, 5, 4, 48, 15, 24, 71, 0, 0, 47, 28, 12, 51] };
   expect(analyzePlayer(dave)).toBeNull();
 });

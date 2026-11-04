@@ -380,6 +380,7 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
               </button>
             </div>
           )}
+          {open && <p className="addup-hint">Or type the right scores into Half time and Total above.</p>}
           {issue && player.checked && <p className="checked-note">Kept as written. You checked it against the card.</p>}
         </div>
       )}
