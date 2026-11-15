@@ -1,6 +1,6 @@
 import { pickName, rankNames } from './nameMatch';
-import { analyzePlayer, gameProblems } from './scoreCheck';
-import { exifDate } from './image';
+import { analyzePlayer, gameProblems, fillFromRounds } from './scoreCheck';
+import { exifDate, gameDay } from './image';
 
 const ROSTER = ['Kat Herzog', 'Katie Herzog', 'Kristen Herzog', 'Dave Herzog', 'Dan Herzog',
   'Teresa Henrich', 'Aven-itza De Primavera', 'James Ballew', 'Sarah St. Johns', 'Remy Ballew'];
@@ -61,4 +61,19 @@ test('reads the game date from when a JPEG photo was taken', () => {
   const bytes = [0xff, 0xd8, 0xff, 0xe1, 0, app1.length + 2, ...app1];
   // Taken at 4:37 AM, so it counts as the night before (the sheet has this game on 3/2/2024).
   expect(exifDate(new DataView(new Uint8Array(bytes).buffer))).toBe('2024-03-02');
+});
+
+test('a photo taken after midnight counts as the night before', () => {
+  expect(gameDay(new Date(2026, 10, 15, 1, 30))).toBe('2026-11-14');
+  expect(gameDay(new Date(2026, 10, 15, 19, 0))).toBe('2026-11-15');
+});
+
+test('a blank half time or total is worked out from the rounds', () => {
+  const rounds = [71, 21, 0, 0, 24, 0, 0, 9, 24, 0, 0, 6, 0];
+  const both = fillFromRounds({ half: '', total: '', rounds, split: 7 });
+  expect([both.half, both.total, both.calc]).toEqual(['116', '155', { half: true, total: true }]);
+  const totalOnly = fillFromRounds({ half: '116', total: '', rounds, split: 7 });
+  expect([totalOnly.total, totalOnly.calc.half]).toEqual(['155', false]);
+  const written = fillFromRounds({ half: '116', total: '150', rounds, split: 7 });
+  expect([written.total, written.calc.total]).toEqual(['150', false]);
 });
