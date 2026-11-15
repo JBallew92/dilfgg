@@ -45,6 +45,18 @@ export function analyzePlayer(player) {
   };
 }
 
+// Fills a half time or total the card left blank from the rounds, and marks it
+// as calculated. A calculated number keeps following the rounds as they're fixed.
+export function fillFromRounds(player) {
+  const calc = { half: player.half === '' || !!(player.calc && player.calc.half),
+    total: player.total === '' || !!(player.calc && player.calc.total) };
+  if (!hasRounds(player) || (!calc.half && !calc.total)) return { ...player, calc: { half: false, total: false } };
+  const at = player.split === 6 || player.split === 7 ? player.split : 6;
+  const h = calc.half ? add(player.rounds.slice(0, at)) : Number(player.half);
+  const total = h + add(player.rounds.slice(calc.half ? at : splitAt(player)));
+  return { ...player, half: calc.half ? String(h) : player.half, total: calc.total ? String(total) : player.total, calc };
+}
+
 // Placeholder put in the name box for a new player, so the last name gets typed in.
 export const LAST_NAME = 'LastName';
 

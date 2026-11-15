@@ -106,3 +106,47 @@ test('the rounds stay visible for every scanned player, before and after a fix',
   expect(screen.getByText('Adds up')).toBeInTheDocument();
   expect(screen.getByLabelText('Player 1 round 13')).toBeInTheDocument();
 });
+
+test('the camera opens inside the frame and stops when the page closes', async () => {
+  const stop = vi.fn();
+  navigator.mediaDevices = { getUserMedia: vi.fn(async () => ({ getTracks: () => [{ stop }] })) };
+  const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
+  try {
+    const { container, unmount } = render(<MemoryRouter><Submit /></MemoryRouter>);
+    await waitFor(() => expect(container.querySelector('.frame-guide.live')).not.toBeNull());
+    expect(navigator.mediaDevices.getUserMedia.mock.calls[0][0].video.facingMode).toEqual({ ideal: 'environment' });
+    unmount();
+    expect(stop).toHaveBeenCalled();
+  } finally {
+    play.mockRestore();
+    delete navigator.mediaDevices;
+  }
+});
+
+test('a blocked camera falls back to the phone camera app', async () => {
+  navigator.mediaDevices = { getUserMedia: vi.fn(async () => { throw new Error('denied'); }) };
+  try {
+    const { container } = render(<MemoryRouter><Submit /></MemoryRouter>);
+    await screen.findByText('Fit the whole card in the frame');
+    const click = vi.spyOn(container.querySelector('input[capture]'), 'click');
+    fireEvent.click(screen.getByRole('button', { name: 'Scan Score Card' }));
+    expect(click).toHaveBeenCalled();
+  } finally {
+    delete navigator.mediaDevices;
+  }
+});
+
+test('a total missing from the card is calculated and follows round fixes', async () => {
+  reading.players[0] = { ...reading.players[0], total_written: null };
+  try {
+    const { container } = render(<MemoryRouter><Submit /></MemoryRouter>);
+    fireEvent.change(container.querySelector('input[capture]'), { target: { files: [new File(['x'], 'card.jpg')] } });
+    await screen.findByDisplayValue('James Ballew');
+    expect(screen.getByLabelText('Total', { selector: '#total-1' })).toHaveValue('155');
+    expect(screen.getByText('Calculated')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Player 1 round 13'), { target: { value: '10' } });
+    expect(screen.getByLabelText('Total', { selector: '#total-1' })).toHaveValue('165');
+  } finally {
+    reading.players[0] = { ...reading.players[0], total_written: 155 };
+  }
+});

@@ -92,3 +92,10 @@ export function today() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
+
+// The game night a photo taken right now belongs to: before 6 AM counts as the night before.
+export function gameDay(now = new Date()) {
+  const d = new Date(now);
+  if (d.getHours() < LATE_NIGHT_CUTOFF) d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}

@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { list as playerRows } from '../playerStats.js';
 import { GAME_FORM_URL, NEW_TAB, NewTab, SCAN_ENDPOINT } from '../links';
 import { callScanner } from '../scan/api';
-import { photoDate, shrinkPhoto, today } from '../scan/image';
+import { gameDay, photoDate, shrinkPhoto, today } from '../scan/image';
 import { pickName, rankNames } from '../scan/nameMatch';
-import { LAST_NAME, analyzePlayer, gameProblems, hasRounds, splitAt } from '../scan/scoreCheck';
+import { LAST_NAME, analyzePlayer, fillFromRounds, gameProblems, hasRounds, splitAt } from '../scan/scoreCheck';
 
 const CODE_KEY = 'dilf-league-code';
 const EMAIL_KEY = 'dilf-email';
@@ -60,7 +60,7 @@ export default function Submit() {
       const reading = res.reading;
       setReadNote(res.readError || '');
       const players = reading && reading.players.length
-        ? reading.players.slice(0, 8).map((p) => ({
+        ? reading.players.slice(0, 8).map((p) => fillFromRounds({
           name: pickName(p.name_on_card, p.matched_name, roster),
           picked: pickName(p.name_on_card, p.matched_name, roster),
           written: p.name_on_card,
@@ -72,7 +72,7 @@ export default function Submit() {
           checked: false,
         }))
         : [blankPlayer(), blankPlayer()];
-      setGame((g) => ({ ...g, date: (reading && reading.game_date) || taken || today(), players }));
+      setGame((g) => ({ ...g, date: (reading && reading.game_date) || taken || gameDay(), players }));
       setStep('review');
     } catch (e) {
       if (e.code === 'code') { setStep('code'); setError(e.message); return; }
@@ -194,19 +194,70 @@ function CodeStep({ error, onDone }) {
   );
 }
 
+// Opens the back camera inside the frame. Phones that block it, or have no camera,
+// fall back to the phone's camera app through a file input.
+function useCamera(videoRef) {
+  const [state, setState] = useState('starting'); // starting | live | off
+  useEffect(() => {
+    const media = navigator.mediaDevices;
+    if (!media || !media.getUserMedia) { setState('off'); return undefined; }
+    let stream = null;
+    let stopped = false;
+    media.getUserMedia({
+      audio: false,
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 2560 }, height: { ideal: 1920 } },
+    }).then((s) => {
+      if (stopped) { s.getTracks().forEach((t) => t.stop()); return; }
+      stream = s;
+      const video = videoRef.current;
+      video.srcObject = s;
+      return Promise.resolve(video.play()).then(() => setState('live'));
+    }).catch(() => { if (!stopped) setState('off'); });
+    return () => {
+      stopped = true;
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+    };
+  }, [videoRef]);
+  return state;
+}
+
+function grabFrame(video) {
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  return new Promise((resolve) => canvas.toBlob(
+    (blob) => resolve(new File([blob], 'card.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.92,
+  ));
+}
+
 function CaptureStep({ error, onPhoto, onType }) {
   const cameraRef = useRef(null);
   const libraryRef = useRef(null);
+  const videoRef = useRef(null);
+  const camera = useCamera(videoRef);
+  const live = camera === 'live';
+
+  async function scan() {
+    if (live) onPhoto(await grabFrame(videoRef.current));
+    else cameraRef.current.click();
+  }
+
   return (
     <div className="submit-panel capture">
-      <div className="frame-guide" aria-hidden="true"><span>Fit the whole card in the frame</span></div>
+      <div className={`frame-guide${live ? ' live' : ''}`}>
+        <video ref={videoRef} playsInline muted autoPlay aria-label="Camera view" hidden={camera === 'off'} />
+        {!live && (
+          <span aria-hidden="true">{camera === 'starting' ? 'Starting camera…' : 'Fit the whole card in the frame'}</span>
+        )}
+      </div>
       <ul className="tips">
         <li>Lay the card flat in good light.</li>
         <li>Get every name and the Total row in the photo.</li>
       </ul>
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="capture-actions">
-        <button type="button" className="btn-gold" onClick={() => cameraRef.current.click()}>Scan Score Card</button>
+        <button type="button" className="btn-gold" onClick={scan}>Scan Score Card</button>
         <button type="button" className="btn-outline-gold" onClick={() => libraryRef.current.click()}>Choose a Photo</button>
         <button type="button" className="link-btn" onClick={onType}>Type scores without a photo</button>
       </div>
@@ -295,6 +346,7 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
   const issue = analyzePlayer(player);
   const open = issue && !player.checked;
   const flag = player.unsure ? ' unsure' : '';
+  const calc = player.calc || { half: false, total: false };
   // Any edit to the numbers re-runs the check.
   const edit = (patch) => onChange({ ...patch, checked: false });
   const nameRef = useRef(null);
@@ -351,12 +403,14 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
         <div>
           <label htmlFor={`half-${n}`}>Half time</label>
           <input id={`half-${n}`} className={`score-input${flag}`} inputMode="numeric" pattern="[0-9]*"
-            value={player.half} onChange={(e) => edit({ half: e.target.value.replace(/\D/g, '') })} />
+            value={player.half} onChange={(e) => edit({ half: e.target.value.replace(/\D/g, ''), calc: { ...calc, half: false } })} />
+          {calc.half && <span className="calc-note">Calculated</span>}
         </div>
         <div>
           <label htmlFor={`total-${n}`}>Total</label>
           <input id={`total-${n}`} className={`score-input${flag}`} inputMode="numeric" pattern="[0-9]*"
-            value={player.total} onChange={(e) => edit({ total: e.target.value.replace(/\D/g, '') })} />
+            value={player.total} onChange={(e) => edit({ total: e.target.value.replace(/\D/g, ''), calc: { ...calc, total: false } })} />
+          {calc.total && <span className="calc-note">Calculated</span>}
         </div>
       </div>
       {hasRounds(player) && (
@@ -365,7 +419,11 @@ function PlayerFields({ index, player, roster, onChange, onRemove }) {
             {open ? 'Score Error' : issue ? 'Checked' : 'Adds up'}
           </span>
           <RoundsStrip n={n} player={player} split={issue ? issue.split : splitAt(player)}
-            onRound={(r, v) => edit({ rounds: player.rounds.map((x, k) => (k === r ? v : x)) })} />
+            onRound={(r, v) => {
+              const rounds = player.rounds.map((x, k) => (k === r ? v : x));
+              const { half, total } = fillFromRounds({ ...player, rounds });
+              edit({ rounds, half, total });
+            }} />
           {open && <p className="explain">{issue.message}</p>}
           {open && (
             <div className="addup-actions">
