@@ -1,8 +1,8 @@
 export const list = [
     {
-        "Games Played": 93,
+        "Games Played": 95,
         "Total Players": 36,
-        "Total Score": 130519,
+        "Total Score": 133070,
         "Nations": 2,
         "Winners": 12
     }
