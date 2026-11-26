@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom';
-import { GAME_FORM_URL, PHOTO_FORM_URL, NEW_TAB, NewTab } from '../links';
+import { PHOTO_FORM_URL, NEW_TAB, NewTab } from '../links';
 
 export default function SiteNav() {
   return (
@@ -12,7 +12,7 @@ export default function SiteNav() {
           <Link to="/#app">The App</Link>
         </div>
         <div className="nav-actions">
-          <a className="btn-gold btn-sm" href={GAME_FORM_URL} {...NEW_TAB}>Submit a game <NewTab /></a>
+          <Link className="btn-gold btn-sm" to="/Submit">Submit a game</Link>
           <a className="btn-outline-gold btn-sm" href={PHOTO_FORM_URL} {...NEW_TAB}>Submit a player photo <NewTab /></a>
         </div>
       </nav>
