@@ -7,7 +7,7 @@ export const PHOTO_FORM_URL =
 
 // The Apps Script web app behind the Submit a Game page (see apps-script/README.md).
 // Empty until it is deployed; the page then points players to the Google Form.
-export const SCAN_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxNh3eVNmVm6kTxRRX24gSUXwj9rtjC_8-1BOraLnWswtkl1AByJDsBogNi1tfnVCRB/exec';
+export const SCAN_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxUMjU8i0akdHVLvn4Lr6Xu4dh-uh8t7xY6HIKqN6oGIFzqUmbiDlbIT-W49uyGs2pG/exec';
 
 export const NEW_TAB = { target: '_blank', rel: 'noopener noreferrer' };
 
